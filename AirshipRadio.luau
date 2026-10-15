@@ -342,6 +342,8 @@ local function buildShip(origin)
         ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
         ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
         ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
+        ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
+        ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
     }
     for _, n in ipairs({"Deck_Panel_-13","Deck_Panel_-9","Deck_Panel_-5","Deck_Panel_-1","Deck_Panel_3","Deck_Panel_7","Deck_Panel_11"}) do
         skipTop[n]=true
@@ -386,7 +388,7 @@ local function buildShip(origin)
     local metal = Enum.Material.Metal
     local plastic = Enum.Material.SmoothPlastic
     local hb = hullPart("Hull_Bottom", Vector3.new(24,1,62), black, metal, Vector3.new(0,-2,0), true)
-    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), white, plastic, Vector3.new(0,2,0), true)
+    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), black, plastic, Vector3.new(0,2,0), true)
     local lf = hullPart("Hull_Left_Front", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,16.5), true)
     local lb = hullPart("Hull_Left_Back", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
     local rf = hullPart("Hull_Right_Front", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,16.5), true)
@@ -408,64 +410,62 @@ local function buildShip(origin)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
-    -- ===== nice interior =====
+    -- ===== nice interior (unscaled, fits inside the scaled hull) =====
     local interior = {}
     local function addInt(name, size, color, mat, pos, collide)
-        local p = hullPart(name, size, color, mat, pos, collide)
+        local p = Instance.new("Part")
+        p.Name=name; p.Size=size; p.Color=color; p.Material=mat
+        p.Anchored=true; p.CanCollide=collide
+        p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent=m; p.CFrame=CFrame.new(pos)
         interior[#interior+1] = p
         return p
     end
-    addInt("Int_Floor", Vector3.new(15,0.2,50), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-1.9,0), true)
-    addInt("Int_Ceiling", Vector3.new(15,0.2,50), white, plastic, Vector3.new(0,1.9,0), true)
+    addInt("Int_Floor", Vector3.new(18,0.2,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-2.0,0), true)
     -- interior walls split so the side doorways lead into the main cabin
-    addInt("Int_Wall_L_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,13.5), true)
-    addInt("Int_Wall_L_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,-13.5), true)
-    addInt("Int_Wall_R_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,13.5), true)
-    addInt("Int_Wall_R_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,-13.5), true)
-    for _, z in ipairs({-20,-10,0,10,20}) do
-        addInt("Int_FloorStrip_"..z, Vector3.new(15,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.78,z), false)
+    addInt("Int_Wall_L_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9,0,15), true)
+    addInt("Int_Wall_L_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9,0,-15), true)
+    addInt("Int_Wall_R_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9,0,15), true)
+    addInt("Int_Wall_R_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9,0,-15), true)
+    for _, z in ipairs({-24,-12,0,12,24}) do
+        addInt("Int_FloorStrip_"..z, Vector3.new(18,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.88,z), false)
     end
-    for _, x in ipairs({-5,0,5}) do
-        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,50), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.78,0), false)
+    for _, x in ipairs({-6,0,6}) do
+        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,56), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.87,0), false)
     end
-    for _, z in ipairs({-20,-10,0,10,20}) do
-        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.78,z), false)
+    for _, z in ipairs({-24,-12,0,12,24}) do
+        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.88,z), false)
     end
-    addInt("Int_Dashboard", Vector3.new(14,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,20), true)
+    addInt("Int_Dashboard", Vector3.new(16,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
     for i=1,4 do
-        addInt("Int_Screen_"..i, Vector3.new(2.5,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-5.25 + (i-1)*3.5, 0.6, 19.4), false)
+        addInt("Int_Screen_"..i, Vector3.new(3,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-6 + (i-1)*4, 0.6, 23.4), false)
     end
     for _, s in ipairs({-1,1}) do
-        for _, z in ipairs({-16,-8,8,16}) do
-            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*5.5,-1.4,z), true)
+        for _, z in ipairs({-20,-12,12,20}) do
+            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*7,-1.4,z), true)
         end
     end
-    addInt("Int_Aisle", Vector3.new(2,0.05,50), Color3.fromRGB(200,210,230), Enum.Material.Neon, Vector3.new(0,-1.78,0), false)
-    for _, z in ipairs({-18,-14,14,18}) do
-        addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-0.9,z), true)
+    for _, z in ipairs({-22,-16,16,22}) do
+        addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-1.0,z), true)
     end
-    addInt("Int_Bar", Vector3.new(8,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.3,-22), true)
+    addInt("Int_Bar", Vector3.new(10,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.4,-25), true)
     -- reactor core
-    local reactor = hullPart("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-0.5,-18), true)
+    local reactor = addInt("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-1.0,-22), true)
     reactor.Shape = Enum.PartType.Cylinder
-    interior[#interior+1] = reactor
-    local reactorGlow = hullPart("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-18), false)
+    local reactorGlow = addInt("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-22), false)
     reactorGlow.Shape = Enum.PartType.Cylinder
-    interior[#interior+1] = reactorGlow
     -- table + chairs
-    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-5), true)
+    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-6), true)
     for _, s in ipairs({-1,1}) do
-        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*2.5,-1.4,-5), true)
+        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*3,-1.4,-6), true)
     end
     -- bunk bed
-    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
-    -- wall trim neon
-    for _, s in ipairs({-1,1}) do
-        addInt("Int_WallTrim_"..(s>0 and "R" or "L"), Vector3.new(0.15,0.15,50), neonCyan, Enum.Material.Neon, Vector3.new(s*6.8,1.2,0), false)
-    end
+    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(7,-1,-24), true)
+    -- visible pilot seat
+    addInt("PilotSeatBase", Vector3.new(2.5,0.5,2.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-1.6,22), true)
+    addInt("PilotSeatBack", Vector3.new(2.5,2,0.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-0.6,23.2), true)
     -- terminal in the back
-    local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-24), true)
-    interior[#interior+1] = term
+    local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-27), true)
     local sg = Instance.new("SurfaceGui")
     sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(600,400)
     sg.LightInfluence = 0; sg.Parent = term
@@ -476,24 +476,11 @@ local function buildShip(origin)
     lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.TextYAlignment = Enum.TextYAlignment.Top
     lbl.Text = "BOOTING..."; lbl.Parent = sg
     local termLabel = lbl
-    for _, p in ipairs(interior) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     local pl = Instance.new("PointLight"); pl.Brightness=0.6; pl.Color=Color3.fromRGB(160,220,255); pl.Range=30; pl.Parent=root
 
     local light = Instance.new("PointLight")
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
     m.Parent = workspace
-
-    -- create a rear ramp door not present in model
-    local ramp = Instance.new("Part")
-    ramp.Name="RearRamp"; ramp.Size=Vector3.new(14,0.5,6)
-    ramp.Color=Color3.fromRGB(10,12,16); ramp.Material=Enum.Material.Metal
-    ramp.Anchored=true; ramp.CanCollide=true; ramp.Transparency=0
-    ramp.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
-    ramp.Parent=m
-    ramp.CFrame = CFrame.new(0, -1.5, 34)
-    restMap[ramp] = root.CFrame:ToObjectSpace(ramp.CFrame)
-    -- keep ramp out of the rigid rest application by flagging
-    ramp:SetAttribute("IsRamp", true)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
@@ -510,17 +497,12 @@ local function buildShip(origin)
     ship.doorOpened = false
     ship.hold = false
     ship.terminalLabel = termLabel
-    ship.rampPart = ramp
-    ship.rampPivot = CFrame.new(0, -1.5, 33)
-    ship.rampRot = math.rad(0)
-    ship.rampTarget = math.rad(0)
-    ship.rampOpened = false
-    ship.rampSchedule = tick() + 2.2
+    ship.doorSchedule = tick() + 2.2
     local seat=Instance.new("VehicleSeat")
     seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
     seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
     seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
-    seat.CFrame=CFrame.new(0,2,22)
+    seat.CFrame=CFrame.new(0,-1,22)
     seat.Parent=m
     ship.seat=seat
     ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
@@ -631,22 +613,9 @@ local function updateShip(ship, dt)
         end
         end
     end
-    if ship.rampPart and ship.rampPart.Parent then
-        if not ship.rampOpened and tick() >= ship.rampSchedule then
-            ship.rampOpened = true
-            ship.rampTarget = math.rad(135)
-        end
-        local rate = 2.8
-        local dlt = ship.rampTarget - ship.rampRot
-        if math.abs(dlt) > 1e-4 then
-            local st = math.clamp(dlt, -rate*(dt or 0.016), rate*(dt or 0.016))
-            ship.rampRot = ship.rampRot + st
-        end
-        ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
-    end
     if ship.doorLF and ship.doorLF.Parent then
         local near = hrp and (hrp.Position - root.Position).Magnitude < 16
-        if near or (not ship.doorOpened and tick() >= ship.rampSchedule) then
+        if near or (not ship.doorOpened and tick() >= ship.doorSchedule) then
             ship.doorOpened = true
             ship.doorTarget = 1
         else
@@ -748,9 +717,6 @@ function moveParts(ship, cf)
     end
     if ship.seat and ship.seat.Parent then
         ship.seat.CFrame = root.CFrame * ship.seatRest
-    end
-    if ship.rampPart and ship.rampPart.Parent then
-        ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
     end
     if ship.doorLF and ship.doorLF.Parent then
         ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
