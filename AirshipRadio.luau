@@ -371,6 +371,8 @@ local function buildShip(origin)
         ["Engine_Pod_1_0"]=true, ["Engine_Pod_1_1"]=true, ["Engine_Pod_1_2"]=true, ["Engine_Pod_1_3"]=true,
         ["Engine_Core_-1_0"]=true, ["Engine_Core_-1_1"]=true, ["Engine_Core_-1_2"]=true, ["Engine_Core_-1_3"]=true,
         ["Engine_Core_1_0"]=true, ["Engine_Core_1_1"]=true, ["Engine_Core_1_2"]=true, ["Engine_Core_1_3"]=true,
+        -- Cargo Bay parts
+        ["Cargo_Bay_Frame"]=true, ["Cargo_Bay_Door_Left"]=true, ["Cargo_Bay_Door_Right"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
@@ -642,12 +644,12 @@ local function updateShip(ship, dt)
         end
     end
     if ship.doorLF and ship.doorLF.Parent then
-                local near = hrp and (hrp.Position - root.Position).Magnitude < 5
-        -- Timer-based: open after schedule, stay open; Proximity-based: open when near
-        local timerTriggered = not ship.doorOpened and tick() >= ship.doorSchedule
-        if timerTriggered then
-            ship.doorOpened = true
-                    end
+        local near = hrp and (hrp.Position - root.Position).Magnitude < 5
+        -- Timer logic: after 2.2s, if player was near, doors stay open permanently
+        local timerTriggered = tick() >= ship.doorSchedule
+        if timerTriggered and not ship.doorOpened then
+            ship.doorOpened = near
+        end
         local shouldOpen = near or ship.doorOpened
         if shouldOpen then
             ship.doorTarget = 1
