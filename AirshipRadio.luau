@@ -345,8 +345,11 @@ local function buildShip(origin)
     end
     addInt("Int_Floor", Vector3.new(15,0.2,50), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-1.9,0), true)
     addInt("Int_Ceiling", Vector3.new(15,0.2,50), white, plastic, Vector3.new(0,1.9,0), true)
-    addInt("Int_Wall_L", Vector3.new(0.3,3.9,50), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,0), true)
-    addInt("Int_Wall_R", Vector3.new(0.3,3.9,50), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,0), true)
+    -- interior walls split so the side doorways lead into the main cabin
+    addInt("Int_Wall_L_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,13.5), true)
+    addInt("Int_Wall_L_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,-13.5), true)
+    addInt("Int_Wall_R_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,13.5), true)
+    addInt("Int_Wall_R_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,-13.5), true)
     for _, z in ipairs({-20,-10,0,10,20}) do
         addInt("Int_FloorStrip_"..z, Vector3.new(15,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.78,z), false)
     end
