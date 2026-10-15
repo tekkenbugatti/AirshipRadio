@@ -350,6 +350,11 @@ local function buildShip(origin)
         ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
         -- side lights are decorative, keep them
         -- ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
+        -- Cargo_Crate parts (all of them)
+        ["Cargo_Crate_-5_-10"]=true, ["Cargo_Crate_-5_-4"]=true, ["Cargo_Crate_-5_4"]=true, ["Cargo_Crate_-5_10"]=true,
+        ["Cargo_Crate_5_-10"]=true, ["Cargo_Crate_5_-4"]=true, ["Cargo_Crate_5_4"]=true, ["Cargo_Crate_5_10"]=true,
+        -- Int_Ceiling (model part if any)
+        ["Int_Ceiling"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
@@ -431,7 +436,7 @@ local function buildShip(origin)
         return p
     end
     addInt("Int_Floor", Vector3.new(15,0.2,50), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-1.9,0), true)
-    addInt("Int_Ceiling", Vector3.new(15,0.2,50), white, plastic, Vector3.new(0,1.9,0), true)
+
     -- interior walls split so the side doorways lead into the main cabin
     addInt("Int_Wall_L_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,13.5), true)
     addInt("Int_Wall_L_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,-13.5), true)
@@ -450,15 +455,7 @@ local function buildShip(origin)
     for i=1,4 do
         addInt("Int_Screen_"..i, Vector3.new(2.5,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-5.25 + (i-1)*3.5, 0.6, 19.4), false)
     end
-    for _, s in ipairs({-1,1}) do
-        for _, z in ipairs({-16,-8,8,16}) do
-            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*5.5,-1.4,z), true)
-        end
-    end
     addInt("Int_Aisle", Vector3.new(2,0.05,50), Color3.fromRGB(200,210,230), Enum.Material.Neon, Vector3.new(0,-1.78,0), false)
-    for _, z in ipairs({-18,-14,14,18}) do
-        addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-0.9,z), true)
-    end
     addInt("Int_Bar", Vector3.new(8,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.3,-22), true)
     -- reactor core
     local reactor = hullPart("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-0.5,-18), true)
@@ -467,11 +464,6 @@ local function buildShip(origin)
     local reactorGlow = hullPart("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-18), false)
     reactorGlow.Shape = Enum.PartType.Cylinder
     interior[#interior+1] = reactorGlow
-    -- table + chairs
-    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-5), true)
-    for _, s in ipairs({-1,1}) do
-        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*2.5,-1.4,-5), true)
-    end
     -- bunk bed
     addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
 
