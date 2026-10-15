@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 1.4  -- vertical scale (decreased by 5 studs from previous)
+    local VS = 2.15  -- vertical scale (increased by 3 studs)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
