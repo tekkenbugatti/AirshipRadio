@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 1.6  -- vertical scale (ship a little taller)
+    local VS = 1.45  -- vertical scale (ship a little taller)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -341,13 +341,7 @@ local function buildShip(origin)
         Interior_Main_Deck=true,
         ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
         ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
-        ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
-        ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
-        ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
     }
-    for _, n in ipairs({"Deck_Panel_-13","Deck_Panel_-9","Deck_Panel_-5","Deck_Panel_-1","Deck_Panel_3","Deck_Panel_7","Deck_Panel_11"}) do
-        skipTop[n]=true
-    end
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
         skipTop[n]=true
@@ -359,18 +353,6 @@ local function buildShip(origin)
     end
     for _, d in ipairs(MODEL_PARTS) do
         if skipTop[d.N] then continue end
-        -- remove vertical side-plate "pillars" entirely
-        if d.N:match("^Side_Armor") then continue end
-        if d.N:match("^Cargo_Crate") then continue end
-        if d.N:match("^Crate_Rib") then continue end
-        if d.N:match("^Crate_Label") then continue end
-        if d.N:match("^Cargo_Bay_Frame") then continue end
-        if d.N:match("^Interior_Bulkhead") then continue end
-        if d.N:match("^Command_Room") then continue end
-        if d.N:match("^Console") then continue end
-        if d.N:match("^Deck_Center_Light") then continue end
-        if d.N:match("^Holo_Table") then continue end
-        if d.N:match("^Pilot_Seat") then continue end
         local p = Instance.new("Part")
         p.Name = d.N
         p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
@@ -399,51 +381,90 @@ local function buildShip(origin)
     local white = Color3.fromRGB(238,240,244)
     local metal = Enum.Material.Metal
     local plastic = Enum.Material.SmoothPlastic
-    local hb = hullPart("Hull_Bottom", Vector3.new(24,0.1,62), black, metal, Vector3.new(0,-2.45,0), true)
-    local ht = hullPart("Hull_Top", Vector3.new(24,0.1,62), black, plastic, Vector3.new(0,2.45,0), true)
-    local lf = hullPart("Hull_Left_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,16.5), true)
-    local lb = hullPart("Hull_Left_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
-    local rf = hullPart("Hull_Right_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,16.5), true)
-    local rb = hullPart("Hull_Right_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,-16.5), true)
+    local hb = hullPart("Hull_Bottom", Vector3.new(24,1,62), black, metal, Vector3.new(0,-2,0), true)
+    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), white, plastic, Vector3.new(0,2,0), true)
+    local lf = hullPart("Hull_Left_Front", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,16.5), true)
+    local lb = hullPart("Hull_Left_Back", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
+    local rf = hullPart("Hull_Right_Front", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,16.5), true)
+    local rb = hullPart("Hull_Right_Back", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,-16.5), true)
     local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
     local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
     local neonCyan = Color3.fromRGB(0,220,255)
+    local jambs = {}
+    for _, s in ipairs({-1,1}) do
+        local jf = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,2.25), true)
+        local jb = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,-2.25), true)
+        local li = hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,1.75,0), true)
+        jambs[#jambs+1]=jf; jambs[#jambs+1]=jb; jambs[#jambs+1]=li
+    end
     local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
     local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
     local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
     local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+    for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
-    -- ===== nice interior (unscaled, fits inside the scaled hull) =====
+    -- ===== nice interior =====
     local interior = {}
     local function addInt(name, size, color, mat, pos, collide)
-        local p = Instance.new("Part")
-        p.Name=name; p.Size=size; p.Color=color; p.Material=mat
-        p.Anchored=true; p.CanCollide=collide
-        p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
-        p.Parent=m; p.CFrame=CFrame.new(pos)
+        local p = hullPart(name, size, color, mat, pos, collide)
         interior[#interior+1] = p
         return p
     end
-    addInt("Int_Floor", Vector3.new(22,0.1,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-3.3,0), true)
-
-    -- side storage lockers along the walls (clear of doors, cockpit, terminal)
-    for _, s in ipairs({-1,1}) do
-        addInt("Int_Locker_"..(s>0 and "R" or "L"), Vector3.new(2,2,4), Color3.fromRGB(14,18,24), plastic, Vector3.new(s*8,-2.2,8), true)
+    addInt("Int_Floor", Vector3.new(15,0.2,50), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-1.9,0), true)
+    addInt("Int_Ceiling", Vector3.new(15,0.2,50), white, plastic, Vector3.new(0,1.9,0), true)
+    -- interior walls split so the side doorways lead into the main cabin
+    addInt("Int_Wall_L_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,13.5), true)
+    addInt("Int_Wall_L_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,-13.5), true)
+    addInt("Int_Wall_R_F", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,13.5), true)
+    addInt("Int_Wall_R_B", Vector3.new(0.3,3.9,23), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,-13.5), true)
+    for _, z in ipairs({-20,-10,0,10,20}) do
+        addInt("Int_FloorStrip_"..z, Vector3.new(15,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.78,z), false)
     end
-
-    -- clean cockpit dash + screens
-    addInt("Int_Dashboard", Vector3.new(20,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
+    for _, x in ipairs({-5,0,5}) do
+        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,50), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.78,0), false)
+    end
+    for _, z in ipairs({-20,-10,0,10,20}) do
+        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.78,z), false)
+    end
+    addInt("Int_Dashboard", Vector3.new(14,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,20), true)
     for i=1,4 do
-        addInt("Int_Screen_"..i, Vector3.new(3,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-6 + (i-1)*4, 0.6, 23.4), false)
+        addInt("Int_Screen_"..i, Vector3.new(2.5,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-5.25 + (i-1)*3.5, 0.6, 19.4), false)
     end
-
-    -- pilot seat removed (client-sided seats unreliable)
-
-    -- terminal in the back
-    local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0,-27), true)
+    for _, s in ipairs({-1,1}) do
+        for _, z in ipairs({-16,-8,8,16}) do
+            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*5.5,-1.4,z), true)
+        end
+    end
+    addInt("Int_Aisle", Vector3.new(2,0.05,50), Color3.fromRGB(200,210,230), Enum.Material.Neon, Vector3.new(0,-1.78,0), false)
+    for _, z in ipairs({-18,-14,14,18}) do
+        addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-0.9,z), true)
+    end
+    addInt("Int_Bar", Vector3.new(8,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.3,-22), true)
+    -- reactor core
+    local reactor = hullPart("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-0.5,-18), true)
+    reactor.Shape = Enum.PartType.Cylinder
+    interior[#interior+1] = reactor
+    local reactorGlow = hullPart("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-18), false)
+    reactorGlow.Shape = Enum.PartType.Cylinder
+    interior[#interior+1] = reactorGlow
+    -- table + chairs
+    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-5), true)
+    for _, s in ipairs({-1,1}) do
+        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*2.5,-1.4,-5), true)
+    end
+    -- bunk bed
+    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
+    -- wall trim neon
+    for _, s in ipairs({-1,1}) do
+        addInt("Int_WallTrim_"..(s>0 and "R" or "L"), Vector3.new(0.15,0.15,50), neonCyan, Enum.Material.Neon, Vector3.new(s*6.8,1.2,0), false)
+    end
+    -- terminal in the back (rotated 180°)
+    local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-24), true)
+    term.CFrame = term.CFrame * CFrame.Angles(0, math.pi, 0)  -- rotate 180° around Y
+    interior[#interior+1] = term
     local sg = Instance.new("SurfaceGui")
-    sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(600,400)
+    sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Back; sg.CanvasSize = Vector2.new(600,400)
     sg.LightInfluence = 0; sg.Parent = term
     local lbl = Instance.new("TextLabel")
     lbl.Size = UDim2.new(1,0,1,0); lbl.BackgroundColor3 = Color3.fromRGB(3,8,12)
@@ -458,6 +479,18 @@ local function buildShip(origin)
     local light = Instance.new("PointLight")
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
     m.Parent = workspace
+
+    -- create a rear ramp door not present in model
+    local ramp = Instance.new("Part")
+    ramp.Name="RearRamp"; ramp.Size=Vector3.new(14,0.5,6)
+    ramp.Color=Color3.fromRGB(10,12,16); ramp.Material=Enum.Material.Metal
+    ramp.Anchored=true; ramp.CanCollide=true; ramp.Transparency=0
+    ramp.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+    ramp.Parent=m
+    ramp.CFrame = CFrame.new(0, -1.5, 34)
+    restMap[ramp] = root.CFrame:ToObjectSpace(ramp.CFrame)
+    -- keep ramp out of the rigid rest application by flagging
+    ramp:SetAttribute("IsRamp", true)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
@@ -474,10 +507,20 @@ local function buildShip(origin)
     ship.doorOpened = false
     ship.hold = false
     ship.terminalLabel = termLabel
-    ship.doorSchedule = tick() + 2.2
-    -- VehicleSeat removed (client-sided seats unreliable)
-    ship.seat=nil
-    -- seatRest removed
+    ship.rampPart = ramp
+    ship.rampPivot = CFrame.new(0, -1.5, 33)
+    ship.rampRot = math.rad(0)
+    ship.rampTarget = math.rad(0)
+    ship.rampOpened = false
+    ship.rampSchedule = tick() + 2.2
+    local seat=Instance.new("VehicleSeat")
+    seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
+    seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
+    seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
+    seat.CFrame=CFrame.new(0,2,22)
+    seat.Parent=m
+    ship.seat=seat
+    ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
     return ship
 end
 
@@ -563,48 +606,16 @@ local function updateShip(ship, dt)
             end
         end
         ship.hold = onShip
-        -- autopilot toggle (E key when on ship, not seated)
-        if onShip and not ship.pilot and userInputService:IsKeyDown(Enum.KeyCode.E) then
-            if not ship._ePressed then
-                ship._ePressed = true
-                ship.autopilot = not ship.autopilot
-                if ship.autopilot then
-                    ship.anchorPos = ship.root.Position
-                    ship.patrolAngle = 0
-                    if ship.hud and ship.hudHint then
-                        ship.hudHint.Text = "AUTOPILOT ON — holding position. Press E to disable."
-                    end
-                else
-                    if ship.hud and ship.hudHint then
-                        ship.hudHint.Text = "AUTOPILOT OFF — manual control. Press E to enable."
-                    end
-                end
-            end
-        else
-            ship._ePressed = false
-        end
         if onShip then
-            if ship.hud and ship.hudHint and not ship.autopilot then
-                ship.hudHint.Text = "On board — ship holding position. E toggles autopilot."
+            if ship.hud and ship.hudHint then
+                ship.hudHint.Text = "On board — ship holding position. Sit to pilot."
             end
         else
             if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
             if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
-            -- autopilot: hold position when enabled
-            if ship.autopilot then
-                local delta = ship.anchorPos - root.Position
-                local mag = delta.Magnitude
-                local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.5)) or Vector3.zero
-                local targetYaw = math.atan2(ship.anchorPos.X - root.Position.X, ship.anchorPos.Z - root.Position.Z)
-                ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
-                moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
-                if ship.hud and ship.hudHint then
-                    ship.hudHint.Text = "AUTOPILOT — holding position. Press E to disable."
-                end
-            else
-                ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
-                local ga = ship.patrolAngle
-                local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
+            ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
+            local ga = ship.patrolAngle
+            local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
             local delta = goal - root.Position
             local mag = delta.Magnitude
             local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
@@ -614,13 +625,25 @@ local function updateShip(ship, dt)
             if ship.hud and ship.hudHint then
                 ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
             end
-            end
         end
         end
     end
+    if ship.rampPart and ship.rampPart.Parent then
+        if not ship.rampOpened and tick() >= ship.rampSchedule then
+            ship.rampOpened = true
+            ship.rampTarget = math.rad(135)
+        end
+        local rate = 2.8
+        local dlt = ship.rampTarget - ship.rampRot
+        if math.abs(dlt) > 1e-4 then
+            local st = math.clamp(dlt, -rate*(dt or 0.016), rate*(dt or 0.016))
+            ship.rampRot = ship.rampRot + st
+        end
+        ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
+    end
     if ship.doorLF and ship.doorLF.Parent then
         local near = hrp and (hrp.Position - root.Position).Magnitude < 16
-        if near or (not ship.doorOpened and tick() >= ship.doorSchedule) then
+        if near or (not ship.doorOpened and tick() >= ship.rampSchedule) then
             ship.doorOpened = true
             ship.doorTarget = 1
         else
@@ -720,7 +743,12 @@ function moveParts(ship, cf)
             part.CFrame = root.CFrame * rest
         end
     end
-    -- seat removed
+    if ship.seat and ship.seat.Parent then
+        ship.seat.CFrame = root.CFrame * ship.seatRest
+    end
+    if ship.rampPart and ship.rampPart.Parent then
+        ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
+    end
     if ship.doorLF and ship.doorLF.Parent then
         ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
     end
