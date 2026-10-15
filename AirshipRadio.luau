@@ -412,8 +412,7 @@ local function buildShip(origin)
     local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
     local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
     local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
-    for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
-    for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+    for _, p in ipairs({hb,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
     -- ===== nice interior =====
     local interior = {}
