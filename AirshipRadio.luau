@@ -257,7 +257,14 @@ local function buildShip(origin)
     end
 
     local restMap = {}
+    local skipTop = {
+        Antenna_Mast=true, Antenna_Tip=true,
+        ["Radar_Base_-15"]=true, ["Radar_Base_15"]=true,
+        ["Radar_Dish_-15"]=true, ["Radar_Dish_15"]=true,
+    }
+    local doorL, doorR
     for _, d in ipairs(MODEL_PARTS) do
+        if skipTop[d.N] then continue end
         local p = Instance.new("Part")
         p.Name = d.N
         p.Size = d.S
@@ -270,7 +277,9 @@ local function buildShip(origin)
         p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
         p.Parent = m
         p.CFrame = d.C  -- identity space
-        restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
+        if d.N == "Crew_Door_-1" then doorL = p
+        elseif d.N == "Crew_Door_1" then doorR = p
+        else restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     end
 
     local light = Instance.new("PointLight")
@@ -291,6 +300,14 @@ local function buildShip(origin)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
+    ship.doorL = doorL
+    ship.doorR = doorR
+    ship.doorLOpen = root.CFrame:ToObjectSpace(doorL.CFrame)
+    ship.doorROpen = root.CFrame:ToObjectSpace(doorR.CFrame)
+    ship.doorOpen = 0
+    ship.doorTarget = 0
+    ship.doorOpened = false
+    ship.hold = false
     ship.rampPart = ramp
     ship.rampPivot = CFrame.new(0, -1.5, 33)
     ship.rampRot = math.rad(0)
@@ -358,19 +375,37 @@ local function updateShip(ship, dt)
         end
     else
         ship.ejectDebounce = false
-        if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
-        if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
-        ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
-        local ga = ship.patrolAngle
-        local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
-        local delta = goal - root.Position
-        local mag = delta.Magnitude
-        local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
-        local targetYaw = math.atan2(goal.X - root.Position.X, goal.Z - root.Position.Z)
-        ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
-        moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
-        if ship.hud and ship.hudHint then
-            ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
+        -- hold position while the player is standing on the deck
+        local onShip = false
+        if hrp then
+            for _, p in ipairs(hrp:GetTouchingParts()) do
+                if p:IsDescendantOf(ship.assembly) then onShip = true break end
+            end
+            if not onShip then
+                local d = hrp.Position - root.Position
+                if math.abs(d.X) < 40 and math.abs(d.Y) < 14 and math.abs(d.Z) < 40 then onShip = true end
+            end
+        end
+        ship.hold = onShip
+        if onShip then
+            if ship.hud and ship.hudHint then
+                ship.hudHint.Text = "On board — ship holding position. Sit to pilot."
+            end
+        else
+            if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
+            if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
+            ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
+            local ga = ship.patrolAngle
+            local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
+            local delta = goal - root.Position
+            local mag = delta.Magnitude
+            local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
+            local targetYaw = math.atan2(goal.X - root.Position.X, goal.Z - root.Position.Z)
+            ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
+            moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+            if ship.hud and ship.hudHint then
+                ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
+            end
         end
     end
     if ship.rampPart and ship.rampPart.Parent then
@@ -385,6 +420,18 @@ local function updateShip(ship, dt)
             ship.rampRot = ship.rampRot + st
         end
         ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
+    end
+    if ship.doorL and ship.doorL.Parent then
+        if not ship.doorOpened and tick() >= ship.rampSchedule then
+            ship.doorOpened = true
+            ship.doorTarget = 1
+        end
+        local drate = 1.8
+        local dd = ship.doorTarget - ship.doorOpen
+        if math.abs(dd) > 1e-4 then
+            local ds = math.clamp(dd, -drate*(dt or 0.016), drate*(dt or 0.016))
+            ship.doorOpen = ship.doorOpen + ds
+        end
     end
 end
 
@@ -463,6 +510,12 @@ function moveParts(ship, cf)
     end
     if ship.rampPart and ship.rampPart.Parent then
         ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
+    end
+    if ship.doorL and ship.doorL.Parent then
+        ship.doorL.CFrame = root.CFrame * ship.doorLOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
+    end
+    if ship.doorR and ship.doorR.Parent then
+        ship.doorR.CFrame = root.CFrame * ship.doorROpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
     end
 end
 
