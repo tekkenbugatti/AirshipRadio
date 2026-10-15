@@ -7,6 +7,212 @@ local RS  = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 local player = P.LocalPlayer
+local MODEL_PARTS = {
+  { N='Keel_Core', S=Vector3.new(24,5,62), C=CFrame.new(0,0,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Upper_Armor', S=Vector3.new(20,2,54), C=CFrame.new(0,3,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Lower_Keel', S=Vector3.new(15,2,49), C=CFrame.new(0,-3,1, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Armored_Nose_00', S=Vector3.new(16,4,5), C=CFrame.new(0,1,34, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Armored_Nose_01', S=Vector3.new(12,3,5), C=CFrame.new(0,1,39, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Armored_Nose_02', S=Vector3.new(8,2,5), C=CFrame.new(0,1,43, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Armored_Nose_03', S=Vector3.new(4,1.5,5), C=CFrame.new(0,1,46, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Tail_Taper_00', S=Vector3.new(16,4,5), C=CFrame.new(0,1,-32, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Tail_Taper_01', S=Vector3.new(12,3,5), C=CFrame.new(0,1,-37, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Tail_Taper_02', S=Vector3.new(8,2,5), C=CFrame.new(0,1,-41, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Tail_Taper_03', S=Vector3.new(4,1.5,5), C=CFrame.new(0,1,-44, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Side_Armor_-1_0', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,-27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_0', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,-27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_1', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,-18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_1', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,-18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_2', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_2', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_3', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_3', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_4', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_4', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_5', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_5', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_-1_6', S=Vector3.new(1.3,4.2,7), C=CFrame.new(-11.4,0,27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_-1_6', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(-12.12,0.2,27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Light_-1', S=Vector3.new(0.25,0.25,34), C=CFrame.new(-10.7,2.15,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Engine_Pod_-1_0', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(-14.5,-1,-25, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_-1_0', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(-14.5,-1,-27.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_-1_0', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(-14.5,-1,-27.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_-1_1', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(-14.5,-1,-12, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_-1_1', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(-14.5,-1,-14.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_-1_1', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(-14.5,-1,-14.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_-1_2', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(-14.5,-1,12, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_-1_2', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(-14.5,-1,14.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_-1_2', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(-14.5,-1,14.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_-1_3', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(-14.5,-1,25, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_-1_3', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(-14.5,-1,27.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_-1_3', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(-14.5,-1,27.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Side_Armor_1_0', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,-27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_0', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,-27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_1', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,-18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_1', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,-18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_2', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_2', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_3', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_3', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_4', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_4', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_5', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_5', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,18, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Armor_1_6', S=Vector3.new(1.3,4.2,7), C=CFrame.new(11.4,0,27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Yellow_Identification_1_6', S=Vector3.new(0.12,1.4,3.4), C=CFrame.new(12.12,0.2,27, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.05, CC=false, A=true },
+  { N='Side_Light_1', S=Vector3.new(0.25,0.25,34), C=CFrame.new(10.7,2.15,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Engine_Pod_1_0', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(14.5,-1,-25, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_1_0', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(14.5,-1,-27.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_1_0', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(14.5,-1,-27.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_1_1', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(14.5,-1,-12, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_1_1', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(14.5,-1,-14.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_1_1', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(14.5,-1,-14.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_1_2', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(14.5,-1,12, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_1_2', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(14.5,-1,14.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_1_2', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(14.5,-1,14.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Pod_1_3', S=Vector3.new(5.4,4.2,4.2), C=CFrame.new(14.5,-1,25, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Rim_1_3', S=Vector3.new(0.6,4.3,4.3), C=CFrame.new(14.5,-1,27.15, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Engine_Core_1_3', S=Vector3.new(0.35,2.8,2.8), C=CFrame.new(14.5,-1,27.5, -0.4480736161291701,-0.8939966636005579,0.0, 0.8939966636005579,-0.4480736161291701,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Dorsal_Spine', S=Vector3.new(5,2,35), C=CFrame.new(0,5,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Dorsal_Light', S=Vector3.new(0.45,0.15,29), C=CFrame.new(0,6.1,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Radar_Base_-15', S=Vector3.new(1.2,0.7,1.2), C=CFrame.new(0,6,-15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Radar_Dish_-15', S=Vector3.new(0.2,3.2,3.2), C=CFrame.new(0,6.8,-15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(132,151,164), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Radar_Base_15', S=Vector3.new(1.2,0.7,1.2), C=CFrame.new(0,6,15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Radar_Dish_15', S=Vector3.new(0.2,3.2,3.2), C=CFrame.new(0,6.8,15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(132,151,164), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Swept_Wing_-1', S=Vector3.new(17,1.4,12), C=CFrame.new(-12,1,-28, 0.9781476007338057,-0.0,-0.20791169081775934, 0.0,1.0,-0.0, 0.20791169081775934,0.0,0.9781476007338057), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Wing_Stripe_-1', S=Vector3.new(12,0.12,0.55), C=CFrame.new(-13,1.78,-28, 0.9781476007338057,-0.0,-0.20791169081775934, 0.0,1.0,-0.0, 0.20791169081775934,0.0,0.9781476007338057), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Tail_Fin_-1', S=Vector3.new(1.2,7,10), C=CFrame.new(-5,4,-36, 0.984807753012208,-0.0,-0.17364817766693033, 0.0,1.0,-0.0, 0.17364817766693033,0.0,0.984807753012208), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Swept_Wing_1', S=Vector3.new(17,1.4,12), C=CFrame.new(12,1,-28, 0.9781476007338057,0.0,0.20791169081775934, 0.0,1.0,0.0, -0.20791169081775934,0.0,0.9781476007338057), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Wing_Stripe_1', S=Vector3.new(12,0.12,0.55), C=CFrame.new(13,1.78,-28, 0.9781476007338057,0.0,0.20791169081775934, 0.0,1.0,0.0, -0.20791169081775934,0.0,0.9781476007338057), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Tail_Fin_1', S=Vector3.new(1.2,7,10), C=CFrame.new(5,4,-36, 0.984807753012208,0.0,0.17364817766693033, 0.0,1.0,0.0, -0.17364817766693033,0.0,0.984807753012208), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Bridge_Base', S=Vector3.new(13,3,10), C=CFrame.new(0,4,25, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Bridge_Front_Glass', S=Vector3.new(10,2.2,0.35), C=CFrame.new(0,5.5,29.8, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.25, CC=false, A=true },
+  { N='Bridge_Side_Glass_-1', S=Vector3.new(0.3,2,6), C=CFrame.new(-6.5,5.4,26, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.25, CC=false, A=true },
+  { N='Bridge_Frame_-1', S=Vector3.new(0.35,0.25,4), C=CFrame.new(-5.3,6.7,28, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Bridge_Side_Glass_1', S=Vector3.new(0.3,2,6), C=CFrame.new(6.5,5.4,26, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.25, CC=false, A=true },
+  { N='Bridge_Frame_1', S=Vector3.new(0.35,0.25,4), C=CFrame.new(5.3,6.7,28, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Cargo_Bay_Frame', S=Vector3.new(17,1.2,32), C=CFrame.new(0,-4,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Bay_Door_Left', S=Vector3.new(7,0.35,29), C=CFrame.new(-4.1,-4.8,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Bay_Door_Right', S=Vector3.new(7,0.35,29), C=CFrame.new(4.1,-4.8,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Landing_Gear_-1_-21', S=Vector3.new(1.4,5,1.4), C=CFrame.new(-7,-6,-21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Landing_Foot_-1_-21', S=Vector3.new(3,1.1,2.5), C=CFrame.new(-7,-8.6,-21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Landing_Gear_-1_21', S=Vector3.new(1.4,5,1.4), C=CFrame.new(-7,-6,21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Landing_Foot_-1_21', S=Vector3.new(3,1.1,2.5), C=CFrame.new(-7,-8.6,21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Landing_Gear_1_-21', S=Vector3.new(1.4,5,1.4), C=CFrame.new(7,-6,-21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Landing_Foot_1_-21', S=Vector3.new(3,1.1,2.5), C=CFrame.new(7,-8.6,-21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Landing_Gear_1_21', S=Vector3.new(1.4,5,1.4), C=CFrame.new(7,-6,21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Landing_Foot_1_21', S=Vector3.new(3,1.1,2.5), C=CFrame.new(7,-8.6,21, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Interior_Main_Deck', S=Vector3.new(15.5,0.6,30), C=CFrame.new(0,-1.6,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(132,151,164), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Panel_-13', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,-13, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_-13', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,-13, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_-9', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_-9', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_-5', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,-5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_-5', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,-5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_-1', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,-1, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_-1', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,-1, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_3', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,3, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_3', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,3, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_7', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,7, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_7', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,7, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Deck_Panel_11', S=Vector3.new(14.5,0.08,3.5), C=CFrame.new(0,-1.22,11, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Deck_Center_Light_11', S=Vector3.new(0.16,0.06,2.6), C=CFrame.new(0,-1.14,11, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Interior_Bulkhead_-15', S=Vector3.new(15,5,0.6), C=CFrame.new(0,1,-15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Bulkhead_Sign_Light_-15', S=Vector3.new(7,0.18,0.15), C=CFrame.new(0,3.4,-15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Interior_Bulkhead_15', S=Vector3.new(15,5,0.6), C=CFrame.new(0,1,15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Bulkhead_Sign_Light_15', S=Vector3.new(7,0.18,0.15), C=CFrame.new(0,3.4,15, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Cargo_Crate_-5_-10', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(-5,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_-5_-10', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(-5,2.05,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_-5_-10_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-6.2,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_-5_-10_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-3.8,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_-5_-4', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(-5,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_-5_-4', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(-5,2.05,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_-5_-4_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-6.2,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_-5_-4_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-3.8,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_-5_4', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(-5,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_-5_4', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(-5,2.05,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_-5_4_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-6.2,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_-5_4_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-3.8,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_-5_10', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(-5,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_-5_10', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(-5,2.05,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_-5_10_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-6.2,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_-5_10_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(-3.8,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_5_-10', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(5,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_5_-10', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(5,2.05,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_5_-10_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(3.8,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_5_-10_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(6.2,0.4,-10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_5_-4', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(5,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_5_-4', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(5,2.05,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_5_-4_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(3.8,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_5_-4_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(6.2,0.4,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_5_4', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(5,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_5_4', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(5,2.05,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_5_4_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(3.8,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_5_4_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(6.2,0.4,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Cargo_Crate_5_10', S=Vector3.new(3.4,3.2,3.2), C=CFrame.new(5,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Label_5_10', S=Vector3.new(1.6,0.08,0.9), C=CFrame.new(5,2.05,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Crate_Rib_5_10_-1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(3.8,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crate_Rib_5_10_1.2', S=Vector3.new(0.12,3.25,3.25), C=CFrame.new(6.2,0.4,10, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Rib_-13', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,-13, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_-13', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,-13, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_-9', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_-9', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,-9, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_-5', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,-5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_-5', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,-5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_-1', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,-1, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_-1', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,-1, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_3', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,3, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_3', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,3, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_7', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,7, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_7', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,7, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Ceiling_Rib_11', S=Vector3.new(15.5,0.45,0.55), C=CFrame.new(0,4.5,11, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ceiling_Light_11', S=Vector3.new(5.5,0.12,0.25), C=CFrame.new(0,4.22,11, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Command_Room_Floor', S=Vector3.new(14,0.5,10), C=CFrame.new(0,0,22, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Command_Room_Back_Wall', S=Vector3.new(14,4.5,0.5), C=CFrame.new(0,2,16.7, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Command_Side_Wall_-1', S=Vector3.new(0.5,4.5,10), C=CFrame.new(-7,2,22, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Console_-1', S=Vector3.new(2.4,1.5,5), C=CFrame.new(-4.2,1.2,23, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Console_Screen_-1_21.5', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(-4.2,2.02,21.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Console_Screen_-1_23', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(-4.2,2.02,23, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Console_Screen_-1_24.5', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(-4.2,2.02,24.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Pilot_Seat_Base_-1', S=Vector3.new(1.4,0.4,1.5), C=CFrame.new(-1.6,0.2,26, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Pilot_Seat_Back_-1', S=Vector3.new(1.4,2,0.35), C=CFrame.new(-1.6,1.2,26.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Command_Side_Wall_1', S=Vector3.new(0.5,4.5,10), C=CFrame.new(7,2,22, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(24,31,43), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Console_1', S=Vector3.new(2.4,1.5,5), C=CFrame.new(4.2,1.2,23, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Console_Screen_1_21.5', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(4.2,2.02,21.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Console_Screen_1_23', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(4.2,2.02,23, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Console_Screen_1_24.5', S=Vector3.new(1.5,0.08,0.8), C=CFrame.new(4.2,2.02,24.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Pilot_Seat_Base_1', S=Vector3.new(1.4,0.4,1.5), C=CFrame.new(1.6,0.2,26, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Pilot_Seat_Back_1', S=Vector3.new(1.4,2,0.35), C=CFrame.new(1.6,1.2,26.5, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Holo_Table_Base', S=Vector3.new(3,1.2,2), C=CFrame.new(0,0.6,20, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(12,17,24), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Holo_Table_Surface', S=Vector3.new(3.2,0.12,2.2), C=CFrame.new(0,1.28,20, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0.15, CC=false, A=true },
+  { N='Access_Ramp_-1', S=Vector3.new(2.2,0.35,10), C=CFrame.new(-5,-3,0, 1.0,0.0,0.0, 0.0,0.984807753012208,-0.17364817766693033, -0.0,0.17364817766693033,0.984807753012208), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_-1_-4', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(-5,-2.75,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_-1_-2', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(-5,-2.75,-2, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_-1_0', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(-5,-2.75,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_-1_2', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(-5,-2.75,2, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_-1_4', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(-5,-2.75,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Access_Ramp_1', S=Vector3.new(2.2,0.35,10), C=CFrame.new(5,-3,0, 1.0,0.0,0.0, 0.0,0.984807753012208,-0.17364817766693033, -0.0,0.17364817766693033,0.984807753012208), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_1_-4', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(5,-2.75,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_1_-2', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(5,-2.75,-2, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_1_0', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(5,-2.75,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_1_2', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(5,-2.75,2, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Ramp_Step_1_4', S=Vector3.new(2.2,0.18,0.25), C=CFrame.new(5,-2.75,4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(255,185,35), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Interior_Window_-1_-8', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(-7.7,2,-8, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Interior_Window_-1_0', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(-7.7,2,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Interior_Window_-1_8', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(-7.7,2,8, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Crew_Door_-1', S=Vector3.new(0.15,3.5,3), C=CFrame.new(-7.78,0,14, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crew_Door_Light_-1', S=Vector3.new(0.08,2.5,0.15), C=CFrame.new(-7.9,0,14, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Interior_Window_1_-8', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(7.7,2,-8, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Interior_Window_1_0', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(7.7,2,0, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Interior_Window_1_8', S=Vector3.new(0.15,1.6,2.4), C=CFrame.new(7.7,2,8, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(27,68,84), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0.3, CC=false, A=true },
+  { N='Crew_Door_1', S=Vector3.new(0.15,3.5,3), C=CFrame.new(7.78,0,14, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Block, T=0, CC=true, A=true },
+  { N='Crew_Door_Light_1', S=Vector3.new(0.08,2.5,0.15), C=CFrame.new(7.9,0,14, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Block, T=0, CC=false, A=true },
+  { N='Nose_Sensor_-2', S=Vector3.new(1,1,1), C=CFrame.new(-2,2.3,48, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Nose_Sensor_0', S=Vector3.new(1,1,1), C=CFrame.new(0,2.3,48, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Nose_Sensor_2', S=Vector3.new(1,1,1), C=CFrame.new(2,2.3,48, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,174,255), Mat=Enum.Material.Neon, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+  { N='Antenna_Mast', S=Vector3.new(0.3,5,0.3), C=CFrame.new(0,8,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(66,78,91), Mat=Enum.Material.SmoothPlastic, Sh=Enum.PartType.Cylinder, T=0, CC=true, A=true },
+  { N='Antenna_Tip', S=Vector3.new(0.7,0.7,0.7), C=CFrame.new(0,10.6,-4, 1.0,0.0,0.0, 0.0,1.0,0.0, -0.0,0.0,1.0), Col=Color3.fromRGB(0,255,231), Mat=Enum.Material.Neon, Sh=Enum.PartType.Ball, T=0, CC=true, A=true },
+}
 
 local C = {
     ship = { L = 46, W = 20, H = 10,       -- big, properly scaled
@@ -33,149 +239,56 @@ local function makePart(parent, props)
 end
 
 local function buildShip(origin)
-    local m = Instance.new("Model"); m.Name = "Airship"
-    local L, W, H = C.ship.L, C.ship.W, C.ship.H
-
+    local m = Instance.new("Model"); m.Name = "Militech_Inspired_Airship"
     local root = Instance.new("Part")
-    root.Name = "Root"; root.Size = Vector3.new(W/2, 0.6, L*0.35)
+    root.Name = "Root"; root.Size = Vector3.new(1,1,1)
     root.CFrame = CFrame.new(origin + Vector3.new(0, C.spawn.riseH, 0))
     root.Anchored = true; root.Transparency = 1; root.CanCollide = false
-    root.CustomPhysicalProperties = PhysicalProperties.new(0.05, 0.3, 0.5, 1, 1)
+    root.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent = m
 
-    local function add(props, pos)
-        local part = makePart(m, props)
-        part.CFrame = root.CFrame * CFrame.new(pos)
-        return part
-    end
-
-    -- Outer hull (boxy-enough to read as aircraft) with wing slabs.
-    local body = add({ Name="Hull", Size=Vector3.new(L, H, W), Material=Enum.Material.SmoothPlastic,
-                        Color=pal.hull }, Vector3.new(0, 0, 0))
-    local belly = add({ Name="Belly", Size=Vector3.new(L*0.95, H*0.35, W*0.85), Material=Enum.Material.SmoothPlastic,
-                        Color=pal.panel }, Vector3.new(0, -H*0.38, 0))
-    -- wing-like fins on the sides (slender blade)
-    for _, s in ipairs({-1,1}) do
-        add({ Name=(s>0 and "FinR" or "FinL"),
-            Size=Vector3.new(L*0.5, 0.5, W*0.95), Material=Enum.Material.SmoothPlastic, Color=pal.frame },
-            Vector3.new(s*(W/2+1), 0, 0))
-    end
-    -- cockpit glass (front nose housing)
-    add({ Name="Cockpit",  Size=Vector3.new(W*0.35, H*0.6, L*0.18), Material=Enum.Material.Glass,
-        Color=pal.accent, Transparency=0.5 }, Vector3.new(0, 0, L*0.4))
-    -- rear gondola (lower deck — walking surface)
-    add({ Name="Gondola",  Size=Vector3.new(W*0.55, 1.2, L*0.3), Material=Enum.Material.SmoothPlastic,
-        Color=pal.panel }, Vector3.new(0, -H*0.25, L*0.1))
-
-    -- trim (neon cyan piping)
-    for _, side in ipairs({-1,1}) do
-        add({ Name=(side>0 and "TrimR" or "TrimL"), Size=Vector3.new(L*0.9, 0.25, 0.25), Material=Enum.Material.Neon,
-            Color=pal.accent, Transparency=0.1 }, Vector3.new(side*(W*0.45), 0, 0))
-    end
-    -- warm warning trim on underside
-    add({ Name="WarnStrip", Size=Vector3.new(L*0.8, 0.2, 0.25), Material=Enum.Material.Neon,
-        Color=pal.trim, Transparency=0.15 }, Vector3.new(0, -H*0.45, 0))
-
-    -- thrusters (rear), with glow
-    for _, s in ipairs({-1,1}) do
-        add({ Name=("Thr_"..(s>0 and "R" or "L")), Size=Vector3.new(3, 3, 7), Shape=Enum.PartType.Cylinder,
-            Material=Enum.Material.Metal, Color=Color3.fromRGB(38,40,46) },
-            Vector3.new(s*(W*0.25), 0, -L*0.42))
-        add({ Name="Glow_"..(s>0 and "R" or "L"),
-            Size=Vector3.new(1.6, 1.6, 3), Shape=Enum.PartType.Cylinder, Material=Enum.Material.Neon,
-            Color=pal.glow, Transparency=0.2 }, Vector3.new(s*(W*0.25), 0, -L*0.43))
-    end
-
-    -- tail stabilizers
-    for _, s in ipairs({-1,1}) do
-        add({ Name=(s>0 and "StabR" or "StabL"), Size=Vector3.new(1, 5, 5), Material=Enum.Material.SmoothPlastic, Color=pal.frame },
-            Vector3.new(s*(W*0.4), H*0.45, -L*0.4))
-    end
-
-    -- ===== interior =====
-    local floorY = -H*0.02
-    add({ Name="InteriorFloor",  Size=Vector3.new(L*0.55, 0.35, W*0.45), Material=Enum.Material.SmoothPlastic, Color=pal.floor },
-        Vector3.new(0, -H*0.35, 0))
-    for _, z in ipairs({ W*0.22, -W*0.22 }) do  -- left/right wall panels
-        for _, x in ipairs({ -L*0.2, 0, L*0.2 }) do
-            add({ Name="IntWall", Name="Wall_"..z..x, Size=Vector3.new(L*0.15, H*0.7, 0.3),
-                Material=Enum.Material.SmoothPlastic, Color=pal.panel, Transparency=0.06 },
-                Vector3.new(x, 0, z))
-        end
-    end
-    -- dashboard
-    add({ Name="Dashboard",  Size=Vector3.new(W*0.55, 1.0, 4.5), Material=Enum.Material.SmoothPlastic, Color=Color3.fromRGB(22,26,34) },
-        Vector3.new(0, -H*0.15, L*0.34))
-    -- instrument screens
-    for _, z in ipairs({ -1.6, 1.6 }) do
-        add({ Name="Screen_"..z, Size=Vector3.new(0.15, 1.8, 2), Material=Enum.Material.Neon, Color=pal.accent, Transparency=0.15 },
-            Vector3.new(-(L*0.2), -H*0.05, L*0.35 + z))
-    end
-    -- seats (pilot left; passengers right/rear)
-    local seat = Instance.new("VehicleSeat")
-    seat.Name = "PilotSeat"
-    seat.Size = Vector3.new(2, 1.4, 2.2)
-    seat.Material = Enum.Material.SmoothPlastic; seat.BrickColor = BrickColor.new("Black")
-    seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0
-    seat.CanCollide = true; seat.Anchored = false
-    seat.CFrame = CFrame.new(origin + Vector3.new(-W*0.18, -H*0.05, L*0.25)) -- forward-left
-    -- will be aligned after the anchor settle below
-    seat.Parent = m
-    for _, x in ipairs({ W*0.18, -W*0.18 }) do
-        local pas = Instance.new("VehicleSeat")
-        pas.Name = (x > 0 and "PassengerSeatR" or "PassengerSeatL")
-        pas.Size = Vector3.new(2, 1.4, 2.2)
-        pas.Material = Enum.Material.SmoothPlastic; pas.BrickColor = BrickColor.new("Black")
-        pas.MaxSpeed=0; pas.SteerFloat=0; pas.ThrottleFloat=0
-        pas.CanCollide = true; pas.Anchored = false
-        pas.CFrame = CFrame.new(origin + Vector3.new(x, -H*0.05, L*0.0))
-        pas.Parent = m
-        -- collect later for rests
-    end
-
-    -- interior floor walkway
-    add({ Name="InteriorFloor",  Size=Vector3.new(L*0.6, 0.5, W*0.45), Material=Enum.Material.SmoothPlastic, Color=pal.floor, CanCollide=true },
-        Vector3.new(0, -H*0.15, 0))
-    -- lower access ramp (so they can walk up from the dock)
-    -- anchor a slab in front of hull gondola pointing down
-    add({ Name="BoardingRamp",  Size=Vector3.new(14, 0.4, W*0.45), Material=Enum.Material.SmoothPlastic, Color=pal.frame, CanCollide=true, Transparency=0.05 },
-        Vector3.new(0, -H*0.3, L*0.55))
-        -- slightly tilt down: translate & rotate to make a 12-deg ramp
-    -- Engine room / rear compartment (boxed cargo bay)
-    add({ Name="EngineBay",  Size=Vector3.new(8, 3.5, 5.5), Material=Enum.Material.SmoothPlastic, Color=Color3.fromRGB(22,24,32), Transparency=0.1 },
-        Vector3.new(0, -H*0.1, -L*0.35))
-    -- cargo bay doors (two thin panes on the rear)
-    add({ Name="BayDoorL",  Size=Vector3.new(0.15, 3, 3), Material=Enum.Material.SmoothPlastic, Color=pal.hull },
-       Vector3.new(-4.2, -H*0.1, -L*0.42))
-    add({ Name="BayDoorR",  Size=Vector3.new(0.15, 3, 3), Material=Enum.Material.SmoothPlastic, Color=pal.hull },
-       Vector3.new(4.2, -H*0.1, -L*0.42))
-
-    local light = Instance.new("PointLight")
-    light.Brightness = 0.7; light.Color = pal.accent; light.Range = 50; light.Shadows = false; light.Parent = root
-
-    m.Parent = game:FindFirstChild("Workspace") or workspace
-
-    local ship = { root = root, assembly = m, seat = seat, hud = nil, alive = true, conn = nil,
-        aimYaw = 0, patrolAngle = 0, pilot = false, ejectDebounce = false }
-    -- capture rests
     local restMap = {}
-    for _, c in ipairs(m:GetDescendants()) do
-        if c:IsA("BasePart") and c ~= root then
-            restMap[c] = root.CFrame:ToObjectSpace(c.CFrame)
-        end
+    for _, d in ipairs(MODEL_PARTS) do
+        local part = Instance.new("Part")
+        part.Name = d.N
+        part.Size = d.S
+        part.Color = d.Col
+        part.Material = d.Mat
+        part.Shape = d.Sh
+        part.Transparency = d.T
+        part.CanCollide = d.CC
+        part.Anchored = true
+        part.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        part.Parent = m
+        -- rest offset in root-space (local to original identity)
+        restMap[part] = d.Cf  -- since root is identity offset initially; shift relative to root actual happens in moveParts
     end
-    -- store relative transforms so anchored movement can re-apply them (seats too, but seats unanchored, handle below)
-    ship._rests = restMap
-    ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
-    ship._seatParent = seat
-    -- ensure seats will track root (unanchored; they'll be moved with moveParts)
-    return ship
-end
 
-local shipRef = nil
-if getgenv().__AIRSHIP then
-    if getgenv().__AIRSHIP.destroy then pcall(getgenv().__AIRSHIP.destroy) end
-    getgenv().__AIRSHIP = nil
+    -- light
+    local light = Instance.new("PointLight")
+    light.Brightness = 0.8; light.Color = Color3.fromRGB(120,200,255); light.Range=60; light.Shadows=false
+    light.Parent = root
+
+    m.Parent = workspace
+
+    -- Convert rest relative to root's origin later: since parts needs to be offset by root, adjust:
+    for part, cf in pairs(restMap) do
+        part.CFrame = root.CFrame * cf
+    end
+
+    local ship = { root = root, assembly = m, seat = nil, hud = nil, alive = true, conn = nil,
+        aimYaw = 0, patrolAngle = 0, pilot = false, ejectDebounce = false }
+    ship._rests = restMap
+    -- pilot seat at interior (approx frontal middle)
+    local seat = Instance.new("VehicleSeat")
+    seat.Name = "PilotSeat"; seat.Size = Vector3.new(2.5,1.5,2.5)
+    seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
+    seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
+    seat.CFrame = root.CFrame * CFrame.new(0, 2, -12)
+    seat.Parent = m
+    ship.seat = seat
+    ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
+    return ship
 end
 
 local function moveParts(ship, cf)
@@ -328,21 +441,8 @@ function summonAirship()
     local ship = shipRef
     ship.anchorPos = origin + (hrp and hrp.CFrame.LookVector * 8 or Vector3.new(0,0,0))
     ship.aimYaw = 0
-    -- pop-in
-    task.spawn(function()
-        local r = ship.root
-        local T = tick()
-        while tick() - T < 1.5 and r and r.Parent do
-            local frac = (tick() - T) / 1.5
-            local eased = 1 - math.pow(1 - frac, 3)
-            local y = origin.Y + C.spawn.riseH + (C.spawn.dockAlt - C.spawn.riseH) * eased
-            moveParts(ship, CFrame.new(origin.X, y, origin.Z) * CFrame.Angles(0, 0, 0))
-            task.wait()
-        end
-        if r and r.Parent then
-            moveParts(ship, CFrame.new(origin.X, origin.Y + C.spawn.dockAlt, origin.Z))
-        end
-    end)
+    -- Spawn straight at dock height (no pop-in wait/rely risk).
+    moveParts(ship, CFrame.new(origin.X, origin.Y + C.spawn.dockAlt, origin.Z))
     buildHUD(ship)
     getgenv().__AIRSHIP = { alive=true, destroy=destroyShip, ship=ship }
     ship.conn = RS.Heartbeat:Connect(function(dt)
@@ -356,13 +456,21 @@ local function giveRadioTool()
     local t = buildRadioTool()
     t.Parent = player.Backpack
 end
+-- remove duplicates
+local radios={}
+for _, t in ipairs(player.Backpack:GetChildren()) do
+  if t.Name == "Airship Radio" then radios[#radios+1]=t end
+end
+for i=2,#radios do radios[i]:Destroy() end
+if #radios <= 0 then giveRadioTool() end
+
 if player.Character then task.delay(0.6, giveRadioTool) end
 player.CharacterAdded:Connect(function()
     task.wait(0.8)
-    for _, t in ipairs(player.Backpack:GetChildren()) do
-        if t.Name == "Airship Radio" then t:Destroy() end
-    end
-    giveRadioTool()
+    radios={}
+    for _, t in ipairs(player.Backpack:GetChildren()) do if t.Name=="Airship Radio" then radios[#radios+1]=t end end
+    for i=2,#radios do radios[i]:Destroy() end
+    if #radios==0 then giveRadioTool() end
 end)
 
 print("[Airship] ready. Click 'Airship Radio' to summon (LMB). WASD+QE pilot; Space eject.")
