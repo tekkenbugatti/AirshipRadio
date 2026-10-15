@@ -270,7 +270,19 @@ local function buildShip(origin)
         Keel_Core=true,
         ["Crew_Door_-1"]=true, ["Crew_Door_1"]=true,
         ["Crew_Door_Light_-1"]=true, ["Crew_Door_Light_1"]=true,
+        Interior_Main_Deck=true,
+        ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
+        ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
     }
+    for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
+                       "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
+        skipTop[n]=true
+    end
+    for _, n in ipairs({"Console_Screen_-1_21.5","Console_Screen_-1_23","Console_Screen_-1_24.5","Console_Screen_1_21.5","Console_Screen_1_23","Console_Screen_1_24.5",
+                       "Crate_Label_-5_-10","Crate_Label_-5_-4","Crate_Label_-5_4","Crate_Label_-5_10","Crate_Label_5_-10","Crate_Label_5_-4","Crate_Label_5_4","Crate_Label_5_10",
+                       "Interior_Window_-1_-8","Interior_Window_-1_0","Interior_Window_-1_8","Interior_Window_1_-8","Interior_Window_1_0","Interior_Window_1_8"}) do
+        skipTop[n]=true
+    end
     for _, d in ipairs(MODEL_PARTS) do
         if skipTop[d.N] then continue end
         local p = Instance.new("Part")
@@ -323,6 +335,43 @@ local function buildShip(origin)
     local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+
+    -- ===== nice interior =====
+    local interior = {}
+    local function addInt(name, size, color, mat, pos, collide)
+        local p = hullPart(name, size, color, mat, pos, collide)
+        interior[#interior+1] = p
+        return p
+    end
+    addInt("Int_Floor", Vector3.new(15,0.2,50), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-1.9,0), true)
+    addInt("Int_Ceiling", Vector3.new(15,0.2,50), white, plastic, Vector3.new(0,1.9,0), true)
+    addInt("Int_Wall_L", Vector3.new(0.3,3.9,50), Color3.fromRGB(20,24,32), plastic, Vector3.new(-7,0,0), true)
+    addInt("Int_Wall_R", Vector3.new(0.3,3.9,50), Color3.fromRGB(20,24,32), plastic, Vector3.new(7,0,0), true)
+    for _, z in ipairs({-20,-10,0,10,20}) do
+        addInt("Int_FloorStrip_"..z, Vector3.new(15,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.78,z), false)
+    end
+    for _, x in ipairs({-5,0,5}) do
+        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,50), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.78,0), false)
+    end
+    for _, z in ipairs({-20,-10,0,10,20}) do
+        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.78,z), false)
+    end
+    addInt("Int_Dashboard", Vector3.new(14,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,20), true)
+    for i=1,4 do
+        addInt("Int_Screen_"..i, Vector3.new(2.5,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-5.25 + (i-1)*3.5, 0.6, 19.4), false)
+    end
+    for _, s in ipairs({-1,1}) do
+        for _, z in ipairs({-16,-8,8,16}) do
+            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*5.5,-1.4,z), true)
+        end
+    end
+    addInt("Int_Aisle", Vector3.new(2,0.05,50), Color3.fromRGB(200,210,230), Enum.Material.Neon, Vector3.new(0,-1.78,0), false)
+    for _, z in ipairs({-18,-14,14,18}) do
+        addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-0.9,z), true)
+    end
+    addInt("Int_Bar", Vector3.new(8,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.3,-22), true)
+    for _, p in ipairs(interior) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+    local pl = Instance.new("PointLight"); pl.Brightness=0.6; pl.Color=Color3.fromRGB(160,220,255); pl.Range=30; pl.Parent=root
 
     local light = Instance.new("PointLight")
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
@@ -489,9 +538,12 @@ local function updateShip(ship, dt)
         ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
     end
     if ship.doorLF and ship.doorLF.Parent then
-        if not ship.doorOpened and tick() >= ship.rampSchedule then
+        local near = hrp and (hrp.Position - root.Position).Magnitude < 16
+        if near or (not ship.doorOpened and tick() >= ship.rampSchedule) then
             ship.doorOpened = true
             ship.doorTarget = 1
+        else
+            ship.doorTarget = 0
         end
         local drate = 1.8
         local dd = ship.doorTarget - ship.doorOpen
@@ -499,6 +551,10 @@ local function updateShip(ship, dt)
             local ds = math.clamp(dd, -drate*(dt or 0.016), drate*(dt or 0.016))
             ship.doorOpen = ship.doorOpen + ds
         end
+        ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
+        ship.doorLB.CFrame = root.CFrame * ship.doorLBOpen * CFrame.new(0,0, -ship.doorOpen*2.6)
+        ship.doorRF.CFrame = root.CFrame * ship.doorRFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
+        ship.doorRB.CFrame = root.CFrame * ship.doorRBOpen * CFrame.new(0,0, -ship.doorOpen*2.6)
     end
 end
 
