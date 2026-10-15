@@ -497,7 +497,7 @@ function destroyShip()
     getgenv().__AIRSHIP = nil
 end
 
-local function moveParts(ship, cf)
+function moveParts(ship, cf)
     local root = ship.root
     root.CFrame = cf
     if ship._rests then
