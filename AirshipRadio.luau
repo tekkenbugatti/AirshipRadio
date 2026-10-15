@@ -265,8 +265,10 @@ local function buildShip(origin)
         ["Landing_Gear_1_-21"]=true, ["Landing_Gear_1_21"]=true,
         ["Landing_Foot_-1_-21"]=true, ["Landing_Foot_-1_21"]=true,
         ["Landing_Foot_1_-21"]=true, ["Landing_Foot_1_21"]=true,
+        Keel_Core=true,
+        ["Crew_Door_-1"]=true, ["Crew_Door_1"]=true,
+        ["Crew_Door_Light_-1"]=true, ["Crew_Door_Light_1"]=true,
     }
-    local doorL, doorR
     for _, d in ipairs(MODEL_PARTS) do
         if skipTop[d.N] then continue end
         local p = Instance.new("Part")
@@ -281,10 +283,40 @@ local function buildShip(origin)
         p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
         p.Parent = m
         p.CFrame = d.C  -- identity space
-        if d.N == "Crew_Door_-1" then doorL = p
-        elseif d.N == "Crew_Door_1" then doorR = p
-        else restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+        restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
     end
+
+    -- hollow hull with side doorways (replaces solid Keel_Core)
+    local function hullPart(name, size, color, mat, pos, collide)
+        local p = Instance.new("Part")
+        p.Name=name; p.Size=size; p.Color=color; p.Material=mat
+        p.Anchored=true; p.CanCollide=collide
+        p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent=m; p.CFrame=CFrame.new(pos)
+        return p
+    end
+    local black = Color3.fromRGB(8,10,14)
+    local white = Color3.fromRGB(238,240,244)
+    local metal = Enum.Material.Metal
+    local plastic = Enum.Material.SmoothPlastic
+    local hb = hullPart("Hull_Bottom", Vector3.new(24,1,62), black, metal, Vector3.new(0,-2,0), true)
+    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), white, plastic, Vector3.new(0,2,0), true)
+    local lf = hullPart("Hull_Left_Front", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,16.5), true)
+    local lb = hullPart("Hull_Left_Back", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
+    local rf = hullPart("Hull_Right_Front", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,16.5), true)
+    local rb = hullPart("Hull_Right_Back", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,-16.5), true)
+    local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
+    local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
+    for _, s in ipairs({-1,1}) do
+        hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), white, plastic, Vector3.new(s*11.5,0,2.25), true)
+        hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), white, plastic, Vector3.new(s*11.5,0,-2.25), true)
+        hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), white, plastic, Vector3.new(s*11.5,1.75,0), true)
+    end
+    local doorLF = hullPart("Door_L_F", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(-12.1,0,1.1), true)
+    local doorLB = hullPart("Door_L_B", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(-12.1,0,-1.1), true)
+    local doorRF = hullPart("Door_R_F", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(12.1,0,1.1), true)
+    local doorRB = hullPart("Door_R_B", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(12.1,0,-1.1), true)
+    for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
     local light = Instance.new("PointLight")
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
@@ -304,10 +336,14 @@ local function buildShip(origin)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
-    ship.doorL = doorL
-    ship.doorR = doorR
-    ship.doorLOpen = root.CFrame:ToObjectSpace(doorL.CFrame)
-    ship.doorROpen = root.CFrame:ToObjectSpace(doorR.CFrame)
+    ship.doorLF = doorLF
+    ship.doorLB = doorLB
+    ship.doorRF = doorRF
+    ship.doorRB = doorRB
+    ship.doorLFOpen = root.CFrame:ToObjectSpace(doorLF.CFrame)
+    ship.doorLBOpen = root.CFrame:ToObjectSpace(doorLB.CFrame)
+    ship.doorRFOpen = root.CFrame:ToObjectSpace(doorRF.CFrame)
+    ship.doorRBOpen = root.CFrame:ToObjectSpace(doorRB.CFrame)
     ship.doorOpen = 0
     ship.doorTarget = 0
     ship.doorOpened = false
@@ -446,7 +482,7 @@ local function updateShip(ship, dt)
         end
         ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
     end
-    if ship.doorL and ship.doorL.Parent then
+    if ship.doorLF and ship.doorLF.Parent then
         if not ship.doorOpened and tick() >= ship.rampSchedule then
             ship.doorOpened = true
             ship.doorTarget = 1
@@ -547,11 +583,17 @@ function moveParts(ship, cf)
     if ship.rampPart and ship.rampPart.Parent then
         ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
     end
-    if ship.doorL and ship.doorL.Parent then
-        ship.doorL.CFrame = root.CFrame * ship.doorLOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
+    if ship.doorLF and ship.doorLF.Parent then
+        ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
     end
-    if ship.doorR and ship.doorR.Parent then
-        ship.doorR.CFrame = root.CFrame * ship.doorROpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
+    if ship.doorLB and ship.doorLB.Parent then
+        ship.doorLB.CFrame = root.CFrame * ship.doorLBOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
+    end
+    if ship.doorRF and ship.doorRF.Parent then
+        ship.doorRF.CFrame = root.CFrame * ship.doorRFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
+    end
+    if ship.doorRB and ship.doorRB.Parent then
+        ship.doorRB.CFrame = root.CFrame * ship.doorRBOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
     end
 end
 
