@@ -331,13 +331,20 @@ local function buildShip(origin)
 
     local restMap={}
     for _,c in ipairs(m:GetDescendants()) do
-       if c:IsA("BasePart") and c~=root then
+       if c:IsA("BasePart") and c~=root and c.Name ~= "RearRamp" then
            restMap[c]=root.CFrame:ToObjectSpace(c.CFrame)
        end
     end
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
+    local rampPart = (function() for _,c in ipairs(m:GetDescendants()) do if c.Name=="RearRamp" then return c end end end)()
+    ship.rampPart = rampPart
+    ship.rampPivot = CFrame.new(0, -H*0.08, L*0.36)
+    ship.rampRot = math.rad(0)
+    ship.rampTarget = math.rad(0)
+    ship.rampOpened = false
+    ship.rampSchedule = tick() + 2.2
     local seat=Instance.new("VehicleSeat")
     seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
     seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
@@ -412,6 +419,19 @@ local function updateShip(ship, dt)
         if ship.hud and ship.hudHint then
             ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
         end
+    end
+    if ship.rampPart and ship.rampPart.Parent then
+        if not ship.rampOpened and tick() >= ship.rampSchedule then
+            ship.rampOpened = true
+            ship.rampTarget = math.rad(135)
+        end
+        local rate = 2.8
+        local dlt = ship.rampTarget - ship.rampRot
+        if math.abs(dlt) > 1e-4 then
+            local st = math.clamp(dlt, -rate*(dt or 0.016), rate*(dt or 0.016))
+            ship.rampRot = ship.rampRot + st
+        end
+        ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
     end
 end
 
