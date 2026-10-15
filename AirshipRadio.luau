@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 1.8  -- vertical scale (taller ship)
+    local VS = 2.2  -- vertical scale (much taller ship)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -375,6 +375,10 @@ local function buildShip(origin)
         -- move Engine_Pod parts UNDER Hull_Bottom (which is at y=-2*VS = -3.6)
         if d.N:find("Engine_Pod") then
             pos = Vector3.new(pos.X, -5 * VS, pos.Z)  -- well below hull bottom at -2*VS
+        end
+        -- move Engine_Rim ABOVE Engine_Pod (Engine_Pod at -5*VS, so Rim at -3.5*VS)
+        if d.N:find("Engine_Rim") then
+            pos = Vector3.new(pos.X, -3.5 * VS, pos.Z)  -- above Engine_Pod at -5*VS
         end
         p.CFrame = CFrame.new(pos) * d.C.Rotation
         p.Parent = m
@@ -465,10 +469,7 @@ local function buildShip(origin)
     end
     -- bunk bed
     addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
-    -- wall trim neon
-    for _, s in ipairs({-1,1}) do
-        addInt("Int_WallTrim_"..(s>0 and "R" or "L"), Vector3.new(0.15,0.15,50), neonCyan, Enum.Material.Neon, Vector3.new(s*6.8,1.2,0), false)
-    end
+
     -- terminal in the back (rotated 180°)
     local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-24), true)
     term.CFrame = term.CFrame * CFrame.Angles(0, math.pi, 0)  -- rotate 180° around Y
