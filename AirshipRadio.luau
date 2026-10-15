@@ -341,7 +341,11 @@ local function buildShip(origin)
         Interior_Main_Deck=true,
         ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
         ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
+        ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
     }
+    for _, n in ipairs({"Deck_Panel_-13","Deck_Panel_-9","Deck_Panel_-5","Deck_Panel_-1","Deck_Panel_3","Deck_Panel_7","Deck_Panel_11"}) do
+        skipTop[n]=true
+    end
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
         skipTop[n]=true
