@@ -366,6 +366,11 @@ local function buildShip(origin)
         if d.N:match("^Crate_Label") then continue end
         if d.N:match("^Cargo_Bay_Frame") then continue end
         if d.N:match("^Interior_Bulkhead") then continue end
+        if d.N:match("^Command_Room") then continue end
+        if d.N:match("^Console") then continue end
+        if d.N:match("^Deck_Center_Light") then continue end
+        if d.N:match("^Holo_Table") then continue end
+        if d.N:match("^Pilot_Seat") then continue end
         local p = Instance.new("Part")
         p.Name = d.N
         p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
@@ -433,9 +438,7 @@ local function buildShip(origin)
         addInt("Int_Screen_"..i, Vector3.new(3,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-6 + (i-1)*4, 0.6, 23.4), false)
     end
 
-    -- visible pilot seat
-    addInt("PilotSeatBase", Vector3.new(2.5,0.5,2.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-3.0,22), true)
-    addInt("PilotSeatBack", Vector3.new(2.5,2,0.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-2.0,23.2), true)
+    -- pilot seat removed (client-sided seats unreliable)
 
     -- terminal in the back
     local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0,-27), true)
@@ -472,14 +475,9 @@ local function buildShip(origin)
     ship.hold = false
     ship.terminalLabel = termLabel
     ship.doorSchedule = tick() + 2.2
-    local seat=Instance.new("VehicleSeat")
-    seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
-    seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
-    seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
-    seat.CFrame=CFrame.new(0,-1,22)
-    seat.Parent=m
-    ship.seat=seat
-    ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
+    -- VehicleSeat removed (client-sided seats unreliable)
+    ship.seat=nil
+    -- seatRest removed
     return ship
 end
 
@@ -565,16 +563,48 @@ local function updateShip(ship, dt)
             end
         end
         ship.hold = onShip
+        -- autopilot toggle (E key when on ship, not seated)
+        if onShip and not ship.pilot and userInputService:IsKeyDown(Enum.KeyCode.E) then
+            if not ship._ePressed then
+                ship._ePressed = true
+                ship.autopilot = not ship.autopilot
+                if ship.autopilot then
+                    ship.anchorPos = ship.root.Position
+                    ship.patrolAngle = 0
+                    if ship.hud and ship.hudHint then
+                        ship.hudHint.Text = "AUTOPILOT ON — holding position. Press E to disable."
+                    end
+                else
+                    if ship.hud and ship.hudHint then
+                        ship.hudHint.Text = "AUTOPILOT OFF — manual control. Press E to enable."
+                    end
+                end
+            end
+        else
+            ship._ePressed = false
+        end
         if onShip then
-            if ship.hud and ship.hudHint then
-                ship.hudHint.Text = "On board — ship holding position. Sit to pilot."
+            if ship.hud and ship.hudHint and not ship.autopilot then
+                ship.hudHint.Text = "On board — ship holding position. E toggles autopilot."
             end
         else
             if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
             if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
-            ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
-            local ga = ship.patrolAngle
-            local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
+            -- autopilot: hold position when enabled
+            if ship.autopilot then
+                local delta = ship.anchorPos - root.Position
+                local mag = delta.Magnitude
+                local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.5)) or Vector3.zero
+                local targetYaw = math.atan2(ship.anchorPos.X - root.Position.X, ship.anchorPos.Z - root.Position.Z)
+                ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
+                moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "AUTOPILOT — holding position. Press E to disable."
+                end
+            else
+                ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
+                local ga = ship.patrolAngle
+                local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
             local delta = goal - root.Position
             local mag = delta.Magnitude
             local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
@@ -583,6 +613,7 @@ local function updateShip(ship, dt)
             moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
             if ship.hud and ship.hudHint then
                 ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
+            end
             end
         end
         end
@@ -689,9 +720,7 @@ function moveParts(ship, cf)
             part.CFrame = root.CFrame * rest
         end
     end
-    if ship.seat and ship.seat.Parent then
-        ship.seat.CFrame = root.CFrame * ship.seatRest
-    end
+    -- seat removed
     if ship.doorLF and ship.doorLF.Parent then
         ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
     end
