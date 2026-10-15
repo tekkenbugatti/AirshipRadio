@@ -239,108 +239,60 @@ local function makePart(parent, props)
 end
 
 local function buildShip(origin)
-    local m = Instance.new("Model"); m.Name = "Airship_Harmony"
-    local L,W,H = 54,22,11
+    local m = Instance.new("Model"); m.Name = "Militech_Inspired_Airship"
     local root = Instance.new("Part")
-    root.Name = "Root"; root.Size = Vector3.new(1,1,1)
+    root.Name="Root"; root.Size=Vector3.new(1,1,1)
     root.CFrame = CFrame.new(0,0,0)
-    root.Anchored = true; root.Transparency = 1; root.CanCollide=false
-    root.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
-    root.Parent = m
+    root.Anchored=true; root.Transparency=1; root.CanCollide=false
+    root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+    root.Parent=m
 
-    local function add(p, pos)
-        local nn = Instance.new("Part")
-        nn.Anchored=p.Anchored~=nil and p.Anchored or true
-        nn.CanCollide=p.CanCollide~=nil and p.CanCollide or true
-        nn.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
-        for k,v in pairs(p) do if k ~= "Anchored" and k ~= "CanCollide" then nn[k]=v end end
-        nn.CFrame = CFrame.new(pos)
-        nn.Parent = m
-        return nn
-    end
-
-    -- === exterior ===
-    local hull = add({Name="Hull_Upper",Size=Vector3.new(L,H,W),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic,Transparency=0}, Vector3.new(0,0,0))
-    local hullLow = add({Name="Hull_Belly",Size=Vector3.new(L*0.98,H*0.55,W*0.92),Color=Color3.fromRGB(14,16,22),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.32,0))
-    local keel = add({Name="Keel", Size=Vector3.new(L*0.7,H*0.25,W*0.25),Color=Color3.fromRGB(30,35,45),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.48,0))
-    local nose = add({Name="Nose", Size=Vector3.new(W*0.4,H*0.95,L*0.22),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.Glass,Transparency=0.35}, Vector3.new(0,H*0.05,L*0.42))
-    local tail = add({Name="TailBoom", Size=Vector3.new(W*0.35,H*0.6,L*0.25),Color=Color3.fromRGB(14,16,22),Material=Enum.Material.Metal}, Vector3.new(0,H*0.05,-L*0.38))
-    local stabL = add({Name="StabL", Size=Vector3.new(1,H*1.5,W*0.55),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.7,-L*0.42))
-    local stabR = add({Name="StabR", Size=Vector3.new(1,H*1.5,W*0.55),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.7,-L*0.42)) -- same lift tube placeholder
-    -- observation deck
-    add({Name="ObsDeck", Size=Vector3.new(W*0.45,H*0.15,L*0.55),Color=Color3.fromRGB(32,36,44),Material=Enum.Material.Glass,Transparency=0.3}, Vector3.new(0,H*0.42,0))
-    add({Name="GlassRail", Size=Vector3.new(W*0.45,0.4,L*0.55),Color=Color3.fromRGB(100,200,255),Material=Enum.Material.Glass,Transparency=0.5}, Vector3.new(0,H*0.5,L*0.05))
-    -- engine pods back rear port+starboard
-    for _, s in ipairs({-1,1}) do
-        add({Name="EngPod_"..(s>0 and "R" or "L"), Size=Vector3.new(5,4,10),Color=Color3.fromRGB(20,24,30),Material=Enum.Material.Metal}, Vector3.new(s*(W*0.55),-H*0.05,-L*0.32))
-        add({Name="EngGlow_"..(s>0 and "R" or "L"), Size=Vector3.new(2.2,2.2,3.2),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(s*(W*0.55),-H*0.05,-L*0.38))
-    end
-    -- exterior trim neon stripes
-    for _, s in ipairs({-1,1}) do
-        add({Name="StripeSide_"..(s>0 and "R" or "L"), Size=Vector3.new(L*0.92,0.25,0.25),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(0,-H*0.05,s*(W*0.48)))
-    end
-    add({Name="StripeBottom", Size=Vector3.new(L*0.92,0.25,0.25),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(0,-H*0.42,0))
-
-    -- === interior ===
-    -- floor
-    add({Name="Int_Floor", Size=Vector3.new(L*0.62,H*0.15,W*0.43),Color=Color3.fromRGB(9,12,16),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.18,0))
-    add({Name="Int_Floor2", Size=Vector3.new(L*0.62,H*0.08,W*0.43),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.3,0))
-    -- grid strips
-    for _, x in ipairs({-18,-12,-6,0,6,12,18}) do
-        add({Name="FloorStrip_"..x, Size=Vector3.new(0.2,H*0.05,W*0.43),Color=Color3.fromRGB(210,215,230),Material=Enum.Material.Neon,Transparency=0.4}, Vector3.new(x, -H*0.07, 0))
-    end
-    -- interior side walls with glass windows
-    for _, s in ipairs({-1,1}) do
-        add({Name="Wall_"..(s>0 and "R" or "L"), Size=Vector3.new(L*0.55,H*0.7,0.4),Color=Color3.fromRGB(18,22,30),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.02,s*(W*0.21)))
-        for _, z in ipairs({-18,-10,0,10,18}) do
-            add({Name="Window_"..(s>0 and "R" or "L").."_"..z, Size=Vector3.new(L*0.12,H*0.35,0.08),Color=Color3.fromRGB(120,200,255),Material=Enum.Material.Glass,Transparency=0.55}, Vector3.new(L*0.0, -H*0.05, s*(W*0.215)+z*0.35)) -- simplified
+    local function recolor(c, mat)
+        if mat == Enum.Material.Neon then
+            return Color3.fromRGB(190,235,255)
         end
+        local b = (c.R + c.G + c.B) / 3
+        if b > 0.55 then return Color3.fromRGB(238,240,244) end
+        return Color3.fromRGB(8,10,14)
     end
-    -- cockpit dashboard & screens
-    add({Name="Dashboard", Size=Vector3.new(W*0.32,1.6,0.5),Color=Color3.fromRGB(10,12,16),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.05,L*0.35))
-    add({Name="DashMid", Size=Vector3.new(W*0.32,0.35,3.2),Color=Color3.fromRGB(14,18,24),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.1,L*0.24))
-    for _, z in ipairs({-2.2,-0.8,0.8,2.2}) do
-        add({Name="Screen_"..(z>0 and "R" or "L")..z, Size=Vector3.new(0.15,H*0.45,1.8),Color=Color3.fromRGB(100,200,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(-L*0.16,H*0.05,L*0.28+z))
-    end
-    -- benches & passenger seats
-    for _, i in ipairs({1,2,3}) do
-        add({Name="Couch_"..i, Size=Vector3.new(4,1,8),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.Fabric}, Vector3.new(4,H*0.02,( -L*0.2 +(i-1)*8 )))
-    end
-    for _, i in ipairs({1,2,3}) do
-        add({Name="CouchL_"..i, Size=Vector3.new(4,1,8),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.Fabric}, Vector3.new(-4,H*0.02,( -L*0.2 +(i-1)*8 )))
-    end
-    -- central aisle light strips
-    add({Name="Aisle", Size=Vector3.new(2,0.2,L*0.6),Color=Color3.fromRGB(220,225,235),Material=Enum.Material.Neon,Transparency=0.25}, Vector3.new(0,-H*0.03,0))
-    -- engine room rear
-    add({Name="EngineCore", Size=Vector3.new(8,5,8),Color=Color3.fromRGB(7,10,14),Material=Enum.Material.Metal}, Vector3.new(0, -H*0.1,-L*0.3))
-    add({Name="EngineRing", Size=Vector3.new(9,0.4,9),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.2}, Vector3.new(0,-H*0.1,-L*0.3))
-    -- boarding ramp/door
-    add({Name="RearRamp", Size=Vector3.new(12,0.6,W*0.45),Color=Color3.fromRGB(32,36,44),Material=Enum.Material.Glass,Transparency=0.4}, Vector3.new(0,-H*0.1,L*0.34))
-    -- storage crates
-    for _, z in ipairs({-6,0,6}) do
-        add({Name="Crate_"..z, Size=Vector3.new(3,2.2,3),Color=Color3.fromRGB(32,36,46),Material=Enum.Material.Metal}, Vector3.new(W*0.09,-H*0.15, z*0.6))
-    end
-    -- ceiling recessed lights
-    for _, x in ipairs({-18,-6,6,18}) do
-        add({Name="CeilLight_"..x, Size=Vector3.new(3,0.25,1),Color=Color3.fromRGB(210,230,255),Material=Enum.Material.Neon,Transparency=0.1}, Vector3.new(x,H*0.32,0))
+
+    local restMap = {}
+    for _, d in ipairs(MODEL_PARTS) do
+        local p = Instance.new("Part")
+        p.Name = d.N
+        p.Size = d.S
+        p.Shape = d.Sh
+        p.Material = d.Mat
+        p.Color = recolor(d.Col, d.Mat)
+        p.Transparency = d.T
+        p.Anchored = true
+        p.CanCollide = (d.T < 0.4) and (d.CC == true)
+        p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent = m
+        p.CFrame = d.C  -- identity space
+        restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
     end
 
     local light = Instance.new("PointLight")
-    light.Brightness=0.8; light.Color=Color3.fromRGB(120,220,255); light.Range=62; light.Shadows=false; light.Parent=root
+    light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
     m.Parent = workspace
 
-    local restMap={}
-    for _,c in ipairs(m:GetDescendants()) do
-       if c:IsA("BasePart") and c~=root and c.Name ~= "RearRamp" then
-           restMap[c]=root.CFrame:ToObjectSpace(c.CFrame)
-       end
-    end
+    -- create a rear ramp door not present in model
+    local ramp = Instance.new("Part")
+    ramp.Name="RearRamp"; ramp.Size=Vector3.new(14,0.5,6)
+    ramp.Color=Color3.fromRGB(10,12,16); ramp.Material=Enum.Material.Metal
+    ramp.Anchored=true; ramp.CanCollide=true; ramp.Transparency=0
+    ramp.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+    ramp.Parent=m
+    ramp.CFrame = CFrame.new(0, -1.5, 34)
+    restMap[ramp] = root.CFrame:ToObjectSpace(ramp.CFrame)
+    -- keep ramp out of the rigid rest application by flagging
+    ramp:SetAttribute("IsRamp", true)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
-    local rampPart = (function() for _,c in ipairs(m:GetDescendants()) do if c.Name=="RearRamp" then return c end end end)()
-    ship.rampPart = rampPart
-    ship.rampPivot = CFrame.new(0, -H*0.08, L*0.36)
+    ship.rampPart = ramp
+    ship.rampPivot = CFrame.new(0, -1.5, 33)
     ship.rampRot = math.rad(0)
     ship.rampTarget = math.rad(0)
     ship.rampOpened = false
@@ -349,12 +301,13 @@ local function buildShip(origin)
     seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
     seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
     seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
-    seat.CFrame = CFrame.new(0,0.5,L*0.27)
+    seat.CFrame=CFrame.new(0,2,22)
     seat.Parent=m
     ship.seat=seat
     ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
     return ship
 end
+
 local function destroyShip()
     if not shipRef then return end
     if shipRef.conn then shipRef.conn:Disconnect() end
