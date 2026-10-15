@@ -238,123 +238,251 @@ local function makePart(parent, props)
     return p
 end
 
+local function trycall(fn, ...)
+    local ok, v = pcall(fn, ...)
+    return ok and v or nil
+end
+
+function getSysInfo()
+    local lines = {}
+    local exec = "Unknown"
+    if type(get_executor_name) == "function" then exec = tostring(get_executor_name()) end
+    if exec == "Unknown" and type(identifyexecutor) == "function" then exec = tostring(identifyexecutor()) end
+    if exec == "Unknown" and type(getexecutorname) == "function" then exec = tostring(getexecutorname()) end
+    if exec == "Unknown" then exec = tostring(getgenv().executor or getgenv().EXECUTOR or "Unknown") end
+    lines[#lines+1] = "EXECUTOR : " .. exec
+
+    local osname = "Unknown"
+    local o = trycall(function() return os.getenv("OS") end)
+    if o then osname = tostring(o) end
+    if osname == "Unknown" then
+        local t = trycall(function() return os.getenv("OSTYPE") end)
+        if t then osname = tostring(t) end
+    end
+    if osname == "Unknown" then
+        local home = trycall(function() return os.getenv("HOME") end)
+        local up = trycall(function() return os.getenv("USERPROFILE") end)
+        if up then osname = "Windows" elseif home then osname = "Unix/Linux" end
+    end
+    lines[#lines+1] = "OS       : " .. osname
+
+    local ram = "Unknown"
+    local r = trycall(function() return getram() end)
+    if r then ram = string.format("%.2f GB", r/1024/1024/1024) end
+    if ram == "Unknown" then
+        local r2 = trycall(function() return getmemoryusage() end)
+        if r2 then ram = string.format("%.2f GB", r2/1024/1024/1024) end
+    end
+    if ram == "Unknown" then
+        local ok, gc = pcall(gcinfo)
+        if ok then ram = string.format("%.1f MB (Roblox)", gc/1024) end
+    end
+    lines[#lines+1] = "RAM      : " .. ram
+
+    local cpu = "Unknown"
+    local c = trycall(function() return getcpucount() end)
+    if c then cpu = tostring(c) .. " cores" end
+    lines[#lines+1] = "CPU      : " .. cpu
+    lines[#lines+1] = "NOTE     : PC stats need executor support"
+
+    local ver = "Unknown"
+    local v = trycall(function() return version() end)
+    if v then ver = tostring(v) end
+    lines[#lines+1] = "ROBLOX   : " .. ver
+
+    local fps = "Unknown"
+    local f = trycall(function() return workspace:GetRealPhysicsFPS() end)
+    if f then fps = string.format("%d", f) end
+    lines[#lines+1] = "FPS      : " .. fps
+
+    lines[#lines+1] = "PLAYER   : " .. tostring(player.Name) .. " (" .. tostring(player.UserId) .. ")"
+
+    local sp = "Unknown"
+    if shipRef and shipRef.root then
+        local p = shipRef.root.Position
+        sp = string.format("(%.0f, %.0f, %.0f)", p.X, p.Y, p.Z)
+    end
+    lines[#lines+1] = "SHIP POS : " .. sp
+    return table.concat(lines, "\n")
+end
+
 local function buildShip(origin)
-    local m = Instance.new("Model"); m.Name = "Airship_Harmony"
-    local L,W,H = 54,22,11
+    local m = Instance.new("Model"); m.Name = "Militech_Inspired_Airship"
     local root = Instance.new("Part")
-    root.Name = "Root"; root.Size = Vector3.new(1,1,1)
+    root.Name="Root"; root.Size=Vector3.new(1,1,1)
     root.CFrame = CFrame.new(0,0,0)
-    root.Anchored = true; root.Transparency = 1; root.CanCollide=false
-    root.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
-    root.Parent = m
+    root.Anchored=true; root.Transparency=1; root.CanCollide=false
+    root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+    root.Parent=m
 
-    local function add(p, pos)
-        local nn = Instance.new("Part")
-        nn.Anchored=p.Anchored~=nil and p.Anchored or true
-        nn.CanCollide=p.CanCollide~=nil and p.CanCollide or true
-        nn.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
-        for k,v in pairs(p) do if k ~= "Anchored" and k ~= "CanCollide" then nn[k]=v end end
-        nn.CFrame = CFrame.new(pos)
-        nn.Parent = m
-        return nn
-    end
+    local VS = 1.6  -- vertical scale (ship a little taller)
 
-    -- === exterior ===
-    local hull = add({Name="Hull_Upper",Size=Vector3.new(L,H,W),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic,Transparency=0}, Vector3.new(0,0,0))
-    local hullLow = add({Name="Hull_Belly",Size=Vector3.new(L*0.98,H*0.55,W*0.92),Color=Color3.fromRGB(14,16,22),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.32,0))
-    local keel = add({Name="Keel", Size=Vector3.new(L*0.7,H*0.25,W*0.25),Color=Color3.fromRGB(30,35,45),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.48,0))
-    local nose = add({Name="Nose", Size=Vector3.new(W*0.4,H*0.95,L*0.22),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.Glass,Transparency=0.35}, Vector3.new(0,H*0.05,L*0.42))
-    local tail = add({Name="TailBoom", Size=Vector3.new(W*0.35,H*0.6,L*0.25),Color=Color3.fromRGB(14,16,22),Material=Enum.Material.Metal}, Vector3.new(0,H*0.05,-L*0.38))
-    local stabL = add({Name="StabL", Size=Vector3.new(1,H*1.5,W*0.55),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.7,-L*0.42))
-    local stabR = add({Name="StabR", Size=Vector3.new(1,H*1.5,W*0.55),Color=Color3.fromRGB(235,238,242),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.7,-L*0.42)) -- same lift tube placeholder
-    -- observation deck
-    add({Name="ObsDeck", Size=Vector3.new(W*0.45,H*0.15,L*0.55),Color=Color3.fromRGB(32,36,44),Material=Enum.Material.Glass,Transparency=0.3}, Vector3.new(0,H*0.42,0))
-    add({Name="GlassRail", Size=Vector3.new(W*0.45,0.4,L*0.55),Color=Color3.fromRGB(100,200,255),Material=Enum.Material.Glass,Transparency=0.5}, Vector3.new(0,H*0.5,L*0.05))
-    -- engine pods back rear port+starboard
-    for _, s in ipairs({-1,1}) do
-        add({Name="EngPod_"..(s>0 and "R" or "L"), Size=Vector3.new(5,4,10),Color=Color3.fromRGB(20,24,30),Material=Enum.Material.Metal}, Vector3.new(s*(W*0.55),-H*0.05,-L*0.32))
-        add({Name="EngGlow_"..(s>0 and "R" or "L"), Size=Vector3.new(2.2,2.2,3.2),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(s*(W*0.55),-H*0.05,-L*0.38))
-    end
-    -- exterior trim neon stripes
-    for _, s in ipairs({-1,1}) do
-        add({Name="StripeSide_"..(s>0 and "R" or "L"), Size=Vector3.new(L*0.92,0.25,0.25),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(0,-H*0.05,s*(W*0.48)))
-    end
-    add({Name="StripeBottom", Size=Vector3.new(L*0.92,0.25,0.25),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(0,-H*0.42,0))
-
-    -- === interior ===
-    -- floor
-    add({Name="Int_Floor", Size=Vector3.new(L*0.62,H*0.15,W*0.43),Color=Color3.fromRGB(9,12,16),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.18,0))
-    add({Name="Int_Floor2", Size=Vector3.new(L*0.62,H*0.08,W*0.43),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.3,0))
-    -- grid strips
-    for _, x in ipairs({-18,-12,-6,0,6,12,18}) do
-        add({Name="FloorStrip_"..x, Size=Vector3.new(0.2,H*0.05,W*0.43),Color=Color3.fromRGB(210,215,230),Material=Enum.Material.Neon,Transparency=0.4}, Vector3.new(x, -H*0.07, 0))
-    end
-    -- interior side walls with glass windows
-    for _, s in ipairs({-1,1}) do
-        add({Name="Wall_"..(s>0 and "R" or "L"), Size=Vector3.new(L*0.55,H*0.7,0.4),Color=Color3.fromRGB(18,22,30),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,-H*0.02,s*(W*0.21)))
-        for _, z in ipairs({-18,-10,0,10,18}) do
-            add({Name="Window_"..(s>0 and "R" or "L").."_"..z, Size=Vector3.new(L*0.12,H*0.35,0.08),Color=Color3.fromRGB(120,200,255),Material=Enum.Material.Glass,Transparency=0.55}, Vector3.new(L*0.0, -H*0.05, s*(W*0.215)+z*0.35)) -- simplified
+    local function recolor(c, mat)
+        if mat == Enum.Material.Neon then
+            return Color3.fromRGB(190,235,255)
         end
+        local b = (c.R + c.G + c.B) / 3
+        if b > 0.55 then return Color3.fromRGB(238,240,244) end
+        return Color3.fromRGB(8,10,14)
     end
-    -- cockpit dashboard & screens
-    add({Name="Dashboard", Size=Vector3.new(W*0.32,1.6,0.5),Color=Color3.fromRGB(10,12,16),Material=Enum.Material.SmoothPlastic}, Vector3.new(0,H*0.05,L*0.35))
-    add({Name="DashMid", Size=Vector3.new(W*0.32,0.35,3.2),Color=Color3.fromRGB(14,18,24),Material=Enum.Material.Metal}, Vector3.new(0,-H*0.1,L*0.24))
-    for _, z in ipairs({-2.2,-0.8,0.8,2.2}) do
-        add({Name="Screen_"..(z>0 and "R" or "L")..z, Size=Vector3.new(0.15,H*0.45,1.8),Color=Color3.fromRGB(100,200,255),Material=Enum.Material.Neon,Transparency=0.15}, Vector3.new(-L*0.16,H*0.05,L*0.28+z))
+
+    local restMap = {}
+    local skipTop = {
+        Antenna_Mast=true, Antenna_Tip=true,
+        ["Radar_Base_-15"]=true, ["Radar_Base_15"]=true,
+        ["Radar_Dish_-15"]=true, ["Radar_Dish_15"]=true,
+        ["Landing_Gear_-1_-21"]=true, ["Landing_Gear_-1_21"]=true,
+        ["Landing_Gear_1_-21"]=true, ["Landing_Gear_1_21"]=true,
+        ["Landing_Foot_-1_-21"]=true, ["Landing_Foot_-1_21"]=true,
+        ["Landing_Foot_1_-21"]=true, ["Landing_Foot_1_21"]=true,
+        Keel_Core=true,
+        ["Crew_Door_-1"]=true, ["Crew_Door_1"]=true,
+        ["Crew_Door_Light_-1"]=true, ["Crew_Door_Light_1"]=true,
+        Interior_Main_Deck=true,
+        ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
+        ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
+        ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
+        ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
+        ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
+    }
+    for _, n in ipairs({"Deck_Panel_-13","Deck_Panel_-9","Deck_Panel_-5","Deck_Panel_-1","Deck_Panel_3","Deck_Panel_7","Deck_Panel_11"}) do
+        skipTop[n]=true
     end
-    -- benches & passenger seats
-    for _, i in ipairs({1,2,3}) do
-        add({Name="Couch_"..i, Size=Vector3.new(4,1,8),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.Fabric}, Vector3.new(4,H*0.02,( -L*0.2 +(i-1)*8 )))
+    for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
+                       "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
+        skipTop[n]=true
     end
-    for _, i in ipairs({1,2,3}) do
-        add({Name="CouchL_"..i, Size=Vector3.new(4,1,8),Color=Color3.fromRGB(14,18,26),Material=Enum.Material.Fabric}, Vector3.new(-4,H*0.02,( -L*0.2 +(i-1)*8 )))
+    for _, n in ipairs({"Console_Screen_-1_21.5","Console_Screen_-1_23","Console_Screen_-1_24.5","Console_Screen_1_21.5","Console_Screen_1_23","Console_Screen_1_24.5",
+                       "Crate_Label_-5_-10","Crate_Label_-5_-4","Crate_Label_-5_4","Crate_Label_-5_10","Crate_Label_5_-10","Crate_Label_5_-4","Crate_Label_5_4","Crate_Label_5_10",
+                       "Interior_Window_-1_-8","Interior_Window_-1_0","Interior_Window_-1_8","Interior_Window_1_-8","Interior_Window_1_0","Interior_Window_1_8"}) do
+        skipTop[n]=true
     end
-    -- central aisle light strips
-    add({Name="Aisle", Size=Vector3.new(2,0.2,L*0.6),Color=Color3.fromRGB(220,225,235),Material=Enum.Material.Neon,Transparency=0.25}, Vector3.new(0,-H*0.03,0))
-    -- engine room rear
-    add({Name="EngineCore", Size=Vector3.new(8,5,8),Color=Color3.fromRGB(7,10,14),Material=Enum.Material.Metal}, Vector3.new(0, -H*0.1,-L*0.3))
-    add({Name="EngineRing", Size=Vector3.new(9,0.4,9),Color=Color3.fromRGB(120,230,255),Material=Enum.Material.Neon,Transparency=0.2}, Vector3.new(0,-H*0.1,-L*0.3))
-    -- boarding ramp/door
-    add({Name="RearRamp", Size=Vector3.new(12,0.6,W*0.45),Color=Color3.fromRGB(32,36,44),Material=Enum.Material.Glass,Transparency=0.4}, Vector3.new(0,-H*0.1,L*0.34))
-    -- storage crates
-    for _, z in ipairs({-6,0,6}) do
-        add({Name="Crate_"..z, Size=Vector3.new(3,2.2,3),Color=Color3.fromRGB(32,36,46),Material=Enum.Material.Metal}, Vector3.new(W*0.09,-H*0.15, z*0.6))
+    for _, d in ipairs(MODEL_PARTS) do
+        if skipTop[d.N] then continue end
+        -- remove vertical side-plate "pillars" entirely
+        if d.N:match("^Side_Armor") then continue end
+        if d.N:match("^Cargo_Crate") then continue end
+        if d.N:match("^Crate_Rib") then continue end
+        if d.N:match("^Crate_Label") then continue end
+        if d.N:match("^Cargo_Bay_Frame") then continue end
+        if d.N:match("^Interior_Bulkhead") then continue end
+        local p = Instance.new("Part")
+        p.Name = d.N
+        p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
+        p.Shape = d.Sh
+        p.Material = d.Mat
+        p.Color = recolor(d.Col, d.Mat)
+        p.Transparency = d.T
+        p.Anchored = true
+        p.CanCollide = (d.T < 0.4) and (d.CC == true)
+        p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent = m
+        p.CFrame = CFrame.new(d.C.Position * Vector3.new(1, VS, 1)) * d.C.Rotation
+        restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
     end
-    -- ceiling recessed lights
-    for _, x in ipairs({-18,-6,6,18}) do
-        add({Name="CeilLight_"..x, Size=Vector3.new(3,0.25,1),Color=Color3.fromRGB(210,230,255),Material=Enum.Material.Neon,Transparency=0.1}, Vector3.new(x,H*0.32,0))
+
+    -- hollow hull with side doorways (replaces solid Keel_Core)
+    local function hullPart(name, size, color, mat, pos, collide)
+        local p = Instance.new("Part")
+        p.Name=name; p.Size=Vector3.new(size.X, size.Y*VS, size.Z); p.Color=color; p.Material=mat
+        p.Anchored=true; p.CanCollide=collide
+        p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent=m; p.CFrame=CFrame.new(pos * Vector3.new(1, VS, 1))
+        return p
     end
+    local black = Color3.fromRGB(8,10,14)
+    local white = Color3.fromRGB(238,240,244)
+    local metal = Enum.Material.Metal
+    local plastic = Enum.Material.SmoothPlastic
+    local hb = hullPart("Hull_Bottom", Vector3.new(24,0.1,62), black, metal, Vector3.new(0,-2.45,0), true)
+    local ht = hullPart("Hull_Top", Vector3.new(24,0.1,62), black, plastic, Vector3.new(0,2.45,0), true)
+    local lf = hullPart("Hull_Left_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,16.5), true)
+    local lb = hullPart("Hull_Left_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
+    local rf = hullPart("Hull_Right_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,16.5), true)
+    local rb = hullPart("Hull_Right_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,-16.5), true)
+    local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
+    local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
+    local neonCyan = Color3.fromRGB(0,220,255)
+    local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
+    local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
+    local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
+    local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
+    for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+
+    -- ===== nice interior (unscaled, fits inside the scaled hull) =====
+    local interior = {}
+    local function addInt(name, size, color, mat, pos, collide)
+        local p = Instance.new("Part")
+        p.Name=name; p.Size=size; p.Color=color; p.Material=mat
+        p.Anchored=true; p.CanCollide=collide
+        p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        p.Parent=m; p.CFrame=CFrame.new(pos)
+        interior[#interior+1] = p
+        return p
+    end
+    addInt("Int_Floor", Vector3.new(22,0.1,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-3.3,0), true)
+
+    -- side storage lockers along the walls (clear of doors, cockpit, terminal)
+    for _, s in ipairs({-1,1}) do
+        addInt("Int_Locker_"..(s>0 and "R" or "L"), Vector3.new(2,2,4), Color3.fromRGB(14,18,24), plastic, Vector3.new(s*8,-2.2,8), true)
+    end
+
+    -- clean cockpit dash + screens
+    addInt("Int_Dashboard", Vector3.new(20,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
+    for i=1,4 do
+        addInt("Int_Screen_"..i, Vector3.new(3,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-6 + (i-1)*4, 0.6, 23.4), false)
+    end
+
+    -- visible pilot seat
+    addInt("PilotSeatBase", Vector3.new(2.5,0.5,2.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-3.0,22), true)
+    addInt("PilotSeatBack", Vector3.new(2.5,2,0.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-2.0,23.2), true)
+
+    -- terminal in the back
+    local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0,-27), true)
+    local sg = Instance.new("SurfaceGui")
+    sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(600,400)
+    sg.LightInfluence = 0; sg.Parent = term
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1,0,1,0); lbl.BackgroundColor3 = Color3.fromRGB(3,8,12)
+    lbl.BackgroundTransparency = 0.15; lbl.TextColor3 = Color3.fromRGB(0,255,170)
+    lbl.Font = Enum.Font.Code; lbl.TextSize = 18
+    lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.TextYAlignment = Enum.TextYAlignment.Top
+    lbl.Text = "BOOTING..."; lbl.Parent = sg
+    local termLabel = lbl
+    for _, p in ipairs(interior) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+    local pl = Instance.new("PointLight"); pl.Brightness=0.6; pl.Color=Color3.fromRGB(160,220,255); pl.Range=30; pl.Parent=root
 
     local light = Instance.new("PointLight")
-    light.Brightness=0.8; light.Color=Color3.fromRGB(120,220,255); light.Range=62; light.Shadows=false; light.Parent=root
+    light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
     m.Parent = workspace
-
-    local restMap={}
-    for _,c in ipairs(m:GetDescendants()) do
-       if c:IsA("BasePart") and c~=root and c.Name ~= "RearRamp" then
-           restMap[c]=root.CFrame:ToObjectSpace(c.CFrame)
-       end
-    end
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
-    local rampPart = (function() for _,c in ipairs(m:GetDescendants()) do if c.Name=="RearRamp" then return c end end end)()
-    ship.rampPart = rampPart
-    ship.rampPivot = CFrame.new(0, -H*0.08, L*0.36)
-    ship.rampRot = math.rad(0)
-    ship.rampTarget = math.rad(0)
-    ship.rampOpened = false
-    ship.rampSchedule = tick() + 2.2
+    ship.doorLF = doorLF
+    ship.doorLB = doorLB
+    ship.doorRF = doorRF
+    ship.doorRB = doorRB
+    ship.doorLFOpen = root.CFrame:ToObjectSpace(doorLF.CFrame)
+    ship.doorLBOpen = root.CFrame:ToObjectSpace(doorLB.CFrame)
+    ship.doorRFOpen = root.CFrame:ToObjectSpace(doorRF.CFrame)
+    ship.doorRBOpen = root.CFrame:ToObjectSpace(doorRB.CFrame)
+    ship.doorOpen = 0
+    ship.doorTarget = 0
+    ship.doorOpened = false
+    ship.hold = false
+    ship.terminalLabel = termLabel
+    ship.doorSchedule = tick() + 2.2
     local seat=Instance.new("VehicleSeat")
     seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
     seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
     seat.MaxSpeed=0; seat.SteerFloat=0; seat.ThrottleFloat=0; seat.CanCollide=true; seat.Anchored=false
-    seat.CFrame = CFrame.new(0,0.5,L*0.27)
+    seat.CFrame=CFrame.new(0,-1,22)
     seat.Parent=m
     ship.seat=seat
     ship.seatRest = root.CFrame:ToObjectSpace(seat.CFrame)
     return ship
 end
+
 local function destroyShip()
     if not shipRef then return end
     if shipRef.conn then shipRef.conn:Disconnect() end
@@ -405,34 +533,92 @@ local function updateShip(ship, dt)
         end
     else
         ship.ejectDebounce = false
-        if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
-        if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
-        ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
-        local ga = ship.patrolAngle
-        local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
-        local delta = goal - root.Position
-        local mag = delta.Magnitude
-        local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
-        local targetYaw = math.atan2(goal.X - root.Position.X, goal.Z - root.Position.Z)
-        ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
-        moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
-        if ship.hud and ship.hudHint then
-            ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
+        -- fly down to the player when called
+        if ship.docking and ship.dockTarget then
+            local d = ship.dockTarget - root.Position
+            if d.Magnitude < 0.6 then
+                ship.docking = false
+                ship.hold = true
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "Landed — doors open. Walk aboard."
+                end
+            else
+                local step = d.Unit * math.min(d.Magnitude, 26 * dt)
+                if hrp then
+                    ship.aimYaw = math.atan2(hrP.Position.X - root.Position.X, hrP.Position.Z - root.Position.Z)
+                end
+                moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "Descending to you..."
+                end
+            end
+        else
+        -- hold position while the player is standing on the deck
+        local onShip = false
+        if hrp then
+            for _, p in ipairs(hrp:GetTouchingParts()) do
+                if p:IsDescendantOf(ship.assembly) then onShip = true break end
+            end
+            if not onShip then
+                local d = hrp.Position - root.Position
+                if math.abs(d.X) < 40 and math.abs(d.Y) < 14 and math.abs(d.Z) < 40 then onShip = true end
+            end
+        end
+        ship.hold = onShip
+        if onShip then
+            if ship.hud and ship.hudHint then
+                ship.hudHint.Text = "On board — ship holding position. Sit to pilot."
+            end
+        else
+            if not ship.spawnPos then ship.spawnPos = origin end -- anchor not set yet if origin local?
+            if not ship.anchorPos then ship.anchorPos = (hrp and hrp.Position or root.Position) end
+            ship.patrolAngle = (ship.patrolAngle or 0) + C.ship.speed * dt
+            local ga = ship.patrolAngle
+            local goal = ship.anchorPos + Vector3.new(math.cos(ga)*C.ship.radius, C.ship.altitude, math.sin(ga)*C.ship.radius)
+            local delta = goal - root.Position
+            local mag = delta.Magnitude
+            local step = (mag > 0.1) and (delta.Unit * math.min(mag, C.ship.maxSpeed*dt*0.4)) or Vector3.zero
+            local targetYaw = math.atan2(goal.X - root.Position.X, goal.Z - root.Position.Z)
+            ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw)*math.min(1, dt*1.4)
+            moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+            if ship.hud and ship.hudHint then
+                ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
+            end
+        end
         end
     end
-    if ship.rampPart and ship.rampPart.Parent then
-        if not ship.rampOpened and tick() >= ship.rampSchedule then
-            ship.rampOpened = true
-            ship.rampTarget = math.rad(135)
+    if ship.doorLF and ship.doorLF.Parent then
+        local near = hrp and (hrp.Position - root.Position).Magnitude < 16
+        if near or (not ship.doorOpened and tick() >= ship.doorSchedule) then
+            ship.doorOpened = true
+            ship.doorTarget = 1
+        else
+            ship.doorTarget = 0
         end
-        local rate = 2.8
-        local dlt = ship.rampTarget - ship.rampRot
-        if math.abs(dlt) > 1e-4 then
-            local st = math.clamp(dlt, -rate*(dt or 0.016), rate*(dt or 0.016))
-            ship.rampRot = ship.rampRot + st
+        local drate = 1.8
+        local dd = ship.doorTarget - ship.doorOpen
+        if math.abs(dd) > 1e-4 then
+            local ds = math.clamp(dd, -drate*(dt or 0.016), drate*(dt or 0.016))
+            ship.doorOpen = ship.doorOpen + ds
         end
-        ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
+        ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
+        ship.doorLB.CFrame = root.CFrame * ship.doorLBOpen * CFrame.new(0,0, -ship.doorOpen*2.6)
+        ship.doorRF.CFrame = root.CFrame * ship.doorRFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
+        ship.doorRB.CFrame = root.CFrame * ship.doorRBOpen * CFrame.new(0,0, -ship.doorOpen*2.6)
     end
+end
+
+local function bringShipDown(ship)
+    if not ship then return end
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local front = hrp.CFrame.LookVector * 10
+    local target = hrp.Position + front
+    ship.dockTarget = Vector3.new(target.X, target.Y + C.spawn.dockAlt, target.Z)
+    ship.docking = true
+    ship.hold = false
+    ship.anchorPos = hrp.Position
+    ship.patrolAngle = 0
 end
 
 local function buildRadioTool()
@@ -456,9 +642,7 @@ local function buildRadioTool()
 
     tool.Activated:Connect(function()
         if shipRef then
-            destroyShip()
-            task.wait(0.2)
-            summonAirship()
+            bringShipDown(shipRef)
         else
             summonAirship()
         end
@@ -508,8 +692,17 @@ function moveParts(ship, cf)
     if ship.seat and ship.seat.Parent then
         ship.seat.CFrame = root.CFrame * ship.seatRest
     end
-    if ship.rampPart and ship.rampPart.Parent then
-        ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
+    if ship.doorLF and ship.doorLF.Parent then
+        ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
+    end
+    if ship.doorLB and ship.doorLB.Parent then
+        ship.doorLB.CFrame = root.CFrame * ship.doorLBOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
+    end
+    if ship.doorRF and ship.doorRF.Parent then
+        ship.doorRF.CFrame = root.CFrame * ship.doorRFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
+    end
+    if ship.doorRB and ship.doorRB.Parent then
+        ship.doorRB.CFrame = root.CFrame * ship.doorRBOpen * CFrame.new(0, 0, -ship.doorOpen * 2.6)
     end
 end
 
@@ -518,12 +711,16 @@ function summonAirship()
     task.wait(0.05)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     local origin = (hrp and hrp.Position) or Vector3.new(0,80,0)
-    -- Float down in front, then settle low enough to board.
+    if hrp then
+        origin = origin + hrp.CFrame.LookVector * 10
+    end
     shipRef = buildShip(origin)
     local ship = shipRef
-    ship.anchorPos = origin + (hrp and hrp.CFrame.LookVector * 8 or Vector3.new(0,0,0))
+    ship.anchorPos = origin
     ship.aimYaw = 0
-    -- Spawn straight at dock height (no pop-in wait/rely risk).
+    ship.docking = false
+    ship.dockTarget = nil
+    ship.hold = false
     moveParts(ship, CFrame.new(origin.X, origin.Y + C.spawn.dockAlt, origin.Z))
     buildHUD(ship)
     getgenv().__AIRSHIP = { alive=true, destroy=destroyShip, ship=ship }
@@ -531,6 +728,14 @@ function summonAirship()
         if not (ship.alive and ship.root and ship.root.Parent) then return end
         updateShip(ship, dt)
     end)
+    if ship.terminalLabel then
+        task.spawn(function()
+            while ship.alive and ship.terminalLabel and ship.terminalLabel.Parent do
+                pcall(function() ship.terminalLabel.Text = getSysInfo() end)
+                task.wait(1)
+            end
+        end)
+    end
 end
 
 local function giveRadioTool()
