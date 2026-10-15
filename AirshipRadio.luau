@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 2.15  -- vertical scale (increased by 3 studs)
+    local VS = 2.00  -- vertical scale
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -483,9 +483,12 @@ local function buildShip(origin)
     -- bunk bed
     addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
 
-    -- terminal in the back (rotated 180°)
-    local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-24), true)
-    term.CFrame = term.CFrame * CFrame.Angles(0, math.pi, 0)  -- rotate 180° around Y
+    -- terminal on inside face of Interior_Bulkhead_15 (at z=15)
+    -- Interior_Bulkhead_15 is at z=15*VS, inside face at ~14.7*VS
+    local bulkheadZ = 15 * VS
+    local insideFaceZ = bulkheadZ - 0.3 * VS  -- inside face of 0.6*VS thick bulkhead
+    local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5, insideFaceZ), true)
+    term.CFrame = term.CFrame * CFrame.Angles(0, math.pi, 0)  -- face inward (negative Z)
     interior[#interior+1] = term
     local sg = Instance.new("SurfaceGui")
     sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Back; sg.CanvasSize = Vector2.new(600,400)
