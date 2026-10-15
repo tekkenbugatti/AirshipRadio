@@ -363,6 +363,8 @@ local function buildShip(origin)
         if d.N:match("^Side_Armor") then continue end
         if d.N:match("^Cargo_Bay_Frame") then continue end
         if d.N:match("^Interior_Bulkhead") then continue end
+        if d.N:match("^Yellow_Identification") then continue end
+        if d.N:match("^Crate_Rib") then continue end
         local p = Instance.new("Part")
         p.Name = d.N
         p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
