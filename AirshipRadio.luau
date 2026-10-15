@@ -649,6 +649,7 @@ local function updateShip(ship, dt)
         local timerTriggered = tick() >= ship.doorSchedule
         if timerTriggered and not ship.doorOpened then
             ship.doorOpened = near
+            _G._DOOR_DEBUG = {timerTriggered=timerTriggered, near=near, doorOpened=ship.doorOpened, tick=tick(), schedule=ship.doorSchedule}
         end
         local shouldOpen = near or ship.doorOpened
         if shouldOpen then
@@ -662,6 +663,7 @@ local function updateShip(ship, dt)
             local ds = math.clamp(dd, -drate*(dt or 0.016), drate*(dt or 0.016))
             ship.doorOpen = ship.doorOpen + ds
         end
+        _G._DOOR_ANIM_DEBUG = {doorOpen=ship.doorOpen, doorTarget=ship.doorTarget, dd=dd, ds=ds or 0, doorOpened=ship.doorOpened, near=near}
         ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
         ship.doorLB.CFrame = root.CFrame * ship.doorLBOpen * CFrame.new(0,0, -ship.doorOpen*2.6)
         ship.doorRF.CFrame = root.CFrame * ship.doorRFOpen * CFrame.new(0,0, ship.doorOpen*2.6)
