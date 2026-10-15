@@ -247,6 +247,8 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
+    local VS = 1.3  -- vertical scale (ship a little taller)
+
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
             return Color3.fromRGB(190,235,255)
@@ -273,7 +275,7 @@ local function buildShip(origin)
         if skipTop[d.N] then continue end
         local p = Instance.new("Part")
         p.Name = d.N
-        p.Size = d.S
+        p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
         p.Shape = d.Sh
         p.Material = d.Mat
         p.Color = recolor(d.Col, d.Mat)
@@ -282,17 +284,17 @@ local function buildShip(origin)
         p.CanCollide = (d.T < 0.4) and (d.CC == true)
         p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
         p.Parent = m
-        p.CFrame = d.C  -- identity space
+        p.CFrame = CFrame.new(d.C.Position * Vector3.new(1, VS, 1)) * d.C.Rotation
         restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
     end
 
     -- hollow hull with side doorways (replaces solid Keel_Core)
     local function hullPart(name, size, color, mat, pos, collide)
         local p = Instance.new("Part")
-        p.Name=name; p.Size=size; p.Color=color; p.Material=mat
+        p.Name=name; p.Size=Vector3.new(size.X, size.Y*VS, size.Z); p.Color=color; p.Material=mat
         p.Anchored=true; p.CanCollide=collide
         p.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
-        p.Parent=m; p.CFrame=CFrame.new(pos)
+        p.Parent=m; p.CFrame=CFrame.new(pos * Vector3.new(1, VS, 1))
         return p
     end
     local black = Color3.fromRGB(8,10,14)
@@ -307,16 +309,20 @@ local function buildShip(origin)
     local rb = hullPart("Hull_Right_Back", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,-16.5), true)
     local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
     local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
+    local neonCyan = Color3.fromRGB(0,220,255)
+    local jambs = {}
     for _, s in ipairs({-1,1}) do
-        hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), white, plastic, Vector3.new(s*11.5,0,2.25), true)
-        hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), white, plastic, Vector3.new(s*11.5,0,-2.25), true)
-        hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), white, plastic, Vector3.new(s*11.5,1.75,0), true)
+        local jf = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,2.25), true)
+        local jb = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,-2.25), true)
+        local li = hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,1.75,0), true)
+        jambs[#jambs+1]=jf; jambs[#jambs+1]=jb; jambs[#jambs+1]=li
     end
-    local doorLF = hullPart("Door_L_F", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(-12.1,0,1.1), true)
-    local doorLB = hullPart("Door_L_B", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(-12.1,0,-1.1), true)
-    local doorRF = hullPart("Door_R_F", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(12.1,0,1.1), true)
-    local doorRB = hullPart("Door_R_B", Vector3.new(0.3,3,2.2), white, plastic, Vector3.new(12.1,0,-1.1), true)
+    local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
+    local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
+    local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
+    local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
+    for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
     local light = Instance.new("PointLight")
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
