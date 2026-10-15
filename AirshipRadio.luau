@@ -497,6 +497,22 @@ function destroyShip()
     getgenv().__AIRSHIP = nil
 end
 
+local function moveParts(ship, cf)
+    local root = ship.root
+    root.CFrame = cf
+    if ship._rests then
+        for part, rest in pairs(ship._rests) do
+            part.CFrame = root.CFrame * rest
+        end
+    end
+    if ship.seat and ship.seat.Parent then
+        ship.seat.CFrame = root.CFrame * ship.seatRest
+    end
+    if ship.rampPart and ship.rampPart.Parent then
+        ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
+    end
+end
+
 function summonAirship()
     destroyShip()
     task.wait(0.05)
