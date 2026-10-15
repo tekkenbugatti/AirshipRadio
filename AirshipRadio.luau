@@ -396,19 +396,11 @@ local function buildShip(origin)
     local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
     local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
     local neonCyan = Color3.fromRGB(0,220,255)
-    local jambs = {}
-    for _, s in ipairs({-1,1}) do
-        local jf = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,2.25), true)
-        local jb = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,-2.25), true)
-        local li = hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,1.75,0), true)
-        jambs[#jambs+1]=jf; jambs[#jambs+1]=jb; jambs[#jambs+1]=li
-    end
     local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
     local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
     local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
     local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
-    for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
     -- ===== nice interior (unscaled, fits inside the scaled hull) =====
     local interior = {}
