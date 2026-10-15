@@ -641,11 +641,12 @@ local function updateShip(ship, dt)
         end
     end
     if ship.doorLF and ship.doorLF.Parent then
-        local near = hrp and (hrp.Position - root.Position).Magnitude < 16
-        if near or (not ship.doorOpened and tick() >= ship.rampSchedule) then
+        local near = hrp and (hrp.Position - root.Position).Magnitude < 5
+        if near then
             ship.doorOpened = true
             ship.doorTarget = 1
         else
+            ship.doorOpened = false
             ship.doorTarget = 0
         end
         local drate = 1.8
