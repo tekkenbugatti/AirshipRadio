@@ -336,6 +336,7 @@ local function buildShip(origin)
         ["Landing_Gear_1_-21"]=true, ["Landing_Gear_1_21"]=true,
         ["Landing_Foot_-1_-21"]=true, ["Landing_Foot_-1_21"]=true,
         ["Landing_Foot_1_-21"]=true, ["Landing_Foot_1_21"]=true,
+        ["Nose_Sensor_-2"]=true, ["Nose_Sensor_0"]=true, ["Nose_Sensor_2"]=true,
         Keel_Core=true,
         ["Crew_Door_-1"]=true, ["Crew_Door_1"]=true,
         ["Crew_Door_Light_-1"]=true, ["Crew_Door_Light_1"]=true,
@@ -379,6 +380,10 @@ local function buildShip(origin)
         -- move Engine_Rim ABOVE Engine_Pod (Engine_Pod at -5*VS, so Rim at -3.5*VS)
         if d.N:find("Engine_Rim") then
             pos = Vector3.new(pos.X, -3.5 * VS, pos.Z)  -- above Engine_Pod at -5*VS
+        end
+        -- move Engine_Core UNDER Engine_Pod (Engine_Pod at -5*VS, so Core at -6*VS)
+        if d.N:find("Engine_Core") then
+            pos = Vector3.new(pos.X, -6 * VS, pos.Z)  -- below Engine_Pod at -5*VS
         end
         p.CFrame = CFrame.new(pos) * d.C.Rotation
         p.Parent = m
