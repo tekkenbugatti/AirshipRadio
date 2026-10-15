@@ -387,12 +387,12 @@ local function buildShip(origin)
     local white = Color3.fromRGB(238,240,244)
     local metal = Enum.Material.Metal
     local plastic = Enum.Material.SmoothPlastic
-    local hb = hullPart("Hull_Bottom", Vector3.new(24,1,62), black, metal, Vector3.new(0,-2,0), true)
-    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), black, plastic, Vector3.new(0,2,0), true)
-    local lf = hullPart("Hull_Left_Front", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,16.5), true)
-    local lb = hullPart("Hull_Left_Back", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
-    local rf = hullPart("Hull_Right_Front", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,16.5), true)
-    local rb = hullPart("Hull_Right_Back", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,-16.5), true)
+    local hb = hullPart("Hull_Bottom", Vector3.new(24,0.1,62), black, metal, Vector3.new(0,-2.45,0), true)
+    local ht = hullPart("Hull_Top", Vector3.new(24,0.1,62), black, plastic, Vector3.new(0,2.45,0), true)
+    local lf = hullPart("Hull_Left_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,16.5), true)
+    local lb = hullPart("Hull_Left_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
+    local rf = hullPart("Hull_Right_Front", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,16.5), true)
+    local rb = hullPart("Hull_Right_Back", Vector3.new(1,4.8,29), black, metal, Vector3.new(11.5,0,-16.5), true)
     local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
     local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
     local neonCyan = Color3.fromRGB(0,220,255)
@@ -413,20 +413,20 @@ local function buildShip(origin)
         interior[#interior+1] = p
         return p
     end
-    addInt("Int_Floor", Vector3.new(19,0.2,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-2.0,0), true)
+    addInt("Int_Floor", Vector3.new(19,0.1,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-2.35,0), true)
     -- interior walls split so the side doorways lead into the main cabin
-    addInt("Int_Wall_L_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,15), true)
-    addInt("Int_Wall_L_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,-15), true)
-    addInt("Int_Wall_R_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,15), true)
-    addInt("Int_Wall_R_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,-15), true)
+    addInt("Int_Wall_L_F", Vector3.new(0.3,4.6,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,15), true)
+    addInt("Int_Wall_L_B", Vector3.new(0.3,4.6,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,-15), true)
+    addInt("Int_Wall_R_F", Vector3.new(0.3,4.6,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,15), true)
+    addInt("Int_Wall_R_B", Vector3.new(0.3,4.6,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,-15), true)
     for _, z in ipairs({-24,-12,0,12,24}) do
-        addInt("Int_FloorStrip_"..z, Vector3.new(19,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.88,z), false)
+        addInt("Int_FloorStrip_"..z, Vector3.new(19,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-2.28,z), false)
     end
     for _, x in ipairs({-6,0,6}) do
-        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,56), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.87,0), false)
+        addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,56), neonCyan, Enum.Material.Neon, Vector3.new(x,-2.27,0), false)
     end
     for _, z in ipairs({-24,-12,0,12,24}) do
-        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.88,z), false)
+        addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,2.28,z), false)
     end
     addInt("Int_Dashboard", Vector3.new(18,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
     for i=1,4 do
@@ -434,30 +434,30 @@ local function buildShip(origin)
     end
     for _, s in ipairs({-1,1}) do
         for _, z in ipairs({-20,-12,12,20}) do
-            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*8,-1.4,z), true)
+            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*8,-1.8,z), true)
         end
     end
     for _, z in ipairs({-22,-16,16,22}) do
         addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-1.0,z), true)
     end
-    addInt("Int_Bar", Vector3.new(12,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.4,-25), true)
+    addInt("Int_Bar", Vector3.new(12,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.8,-25), true)
     -- reactor core
-    local reactor = addInt("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-1.0,-22), true)
+    local reactor = addInt("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,0,-22), true)
     reactor.Shape = Enum.PartType.Cylinder
-    local reactorGlow = addInt("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-22), false)
+    local reactorGlow = addInt("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,2.2,-22), false)
     reactorGlow.Shape = Enum.PartType.Cylinder
     -- table + chairs
-    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-6), true)
+    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-2.0,-6), true)
     for _, s in ipairs({-1,1}) do
-        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*3,-1.4,-6), true)
+        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*3,-1.8,-6), true)
     end
     -- bunk bed
-    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(7,-1,-24), true)
+    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(7,-1.1,-24), true)
     -- visible pilot seat
-    addInt("PilotSeatBase", Vector3.new(2.5,0.5,2.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-1.6,22), true)
-    addInt("PilotSeatBack", Vector3.new(2.5,2,0.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-0.6,23.2), true)
+    addInt("PilotSeatBase", Vector3.new(2.5,0.5,2.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-2.0,22), true)
+    addInt("PilotSeatBack", Vector3.new(2.5,2,0.5), Color3.fromRGB(16,20,28), plastic, Vector3.new(0,-1.0,23.2), true)
     -- terminal in the back
-    local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-27), true)
+    local term = addInt("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0,-27), true)
     local sg = Instance.new("SurfaceGui")
     sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(600,400)
     sg.LightInfluence = 0; sg.Parent = term
