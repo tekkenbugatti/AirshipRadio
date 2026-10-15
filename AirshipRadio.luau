@@ -413,14 +413,14 @@ local function buildShip(origin)
         interior[#interior+1] = p
         return p
     end
-    addInt("Int_Floor", Vector3.new(18,0.2,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-2.0,0), true)
+    addInt("Int_Floor", Vector3.new(19,0.2,56), Color3.fromRGB(10,12,16), plastic, Vector3.new(0,-2.0,0), true)
     -- interior walls split so the side doorways lead into the main cabin
-    addInt("Int_Wall_L_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9,0,15), true)
-    addInt("Int_Wall_L_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9,0,-15), true)
-    addInt("Int_Wall_R_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9,0,15), true)
-    addInt("Int_Wall_R_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9,0,-15), true)
+    addInt("Int_Wall_L_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,15), true)
+    addInt("Int_Wall_L_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(-9.5,0,-15), true)
+    addInt("Int_Wall_R_F", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,15), true)
+    addInt("Int_Wall_R_B", Vector3.new(0.3,4,26), Color3.fromRGB(20,24,32), plastic, Vector3.new(9.5,0,-15), true)
     for _, z in ipairs({-24,-12,0,12,24}) do
-        addInt("Int_FloorStrip_"..z, Vector3.new(18,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.88,z), false)
+        addInt("Int_FloorStrip_"..z, Vector3.new(19,0.05,0.2), neonCyan, Enum.Material.Neon, Vector3.new(0,-1.88,z), false)
     end
     for _, x in ipairs({-6,0,6}) do
         addInt("Int_FloorStripX_"..x, Vector3.new(0.2,0.05,56), neonCyan, Enum.Material.Neon, Vector3.new(x,-1.87,0), false)
@@ -428,19 +428,19 @@ local function buildShip(origin)
     for _, z in ipairs({-24,-12,0,12,24}) do
         addInt("Int_CeilLight_"..z, Vector3.new(4,0.1,1), Color3.fromRGB(220,235,255), Enum.Material.Neon, Vector3.new(0,1.88,z), false)
     end
-    addInt("Int_Dashboard", Vector3.new(16,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
+    addInt("Int_Dashboard", Vector3.new(18,1.5,1), Color3.fromRGB(8,10,14), plastic, Vector3.new(0,0.2,24), true)
     for i=1,4 do
         addInt("Int_Screen_"..i, Vector3.new(3,1.2,0.2), neonCyan, Enum.Material.Neon, Vector3.new(-6 + (i-1)*4, 0.6, 23.4), false)
     end
     for _, s in ipairs({-1,1}) do
         for _, z in ipairs({-20,-12,12,20}) do
-            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*7,-1.4,z), true)
+            addInt("Int_Bench_"..(s>0 and "R" or "L").."_"..z, Vector3.new(2,1,6), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*8,-1.4,z), true)
         end
     end
     for _, z in ipairs({-22,-16,16,22}) do
         addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-1.0,z), true)
     end
-    addInt("Int_Bar", Vector3.new(10,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.4,-25), true)
+    addInt("Int_Bar", Vector3.new(12,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.4,-25), true)
     -- reactor core
     local reactor = addInt("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-1.0,-22), true)
     reactor.Shape = Enum.PartType.Cylinder
@@ -468,6 +468,7 @@ local function buildShip(origin)
     lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.TextYAlignment = Enum.TextYAlignment.Top
     lbl.Text = "BOOTING..."; lbl.Parent = sg
     local termLabel = lbl
+    for _, p in ipairs(interior) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     local pl = Instance.new("PointLight"); pl.Brightness=0.6; pl.Color=Color3.fromRGB(160,220,255); pl.Range=30; pl.Parent=root
 
     local light = Instance.new("PointLight")
