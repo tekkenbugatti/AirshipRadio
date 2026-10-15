@@ -343,19 +343,12 @@ local function buildShip(origin)
         ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
         ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
         -- side armor & cyan/yellow parts (blocking doors)
-        ["Side_Armor_-1_0"]=true, ["Side_Armor_-1_1"]=true, ["Side_Armor_-1_2"]=true,
-        ["Side_Armor_-1_3"]=true, ["Side_Armor_-1_4"]=true, ["Side_Armor_-1_5"]=true,
-        ["Side_Armor_-1_6"]=true, ["Side_Armor_1_0"]=true, ["Side_Armor_1_1"]=true,
-        ["Side_Armor_1_2"]=true, ["Side_Armor_1_3"]=true, ["Side_Armor_1_4"]=true,
-        ["Side_Armor_1_5"]=true, ["Side_Armor_1_6"]=true,
-        ["Yellow_Identification_-1_0"]=true, ["Yellow_Identification_-1_1"]=true,
-        ["Yellow_Identification_-1_2"]=true, ["Yellow_Identification_-1_3"]=true,
-        ["Yellow_Identification_-1_4"]=true, ["Yellow_Identification_-1_5"]=true,
-        ["Yellow_Identification_-1_6"]=true, ["Yellow_Identification_1_0"]=true,
-        ["Yellow_Identification_1_1"]=true, ["Yellow_Identification_1_2"]=true,
-        ["Yellow_Identification_1_3"]=true, ["Yellow_Identification_1_4"]=true,
-        ["Yellow_Identification_1_5"]=true, ["Yellow_Identification_1_6"]=true,
-        ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
+        -- keep all side armor EXCEPT the ones at z=0 (index 3) which block doors
+        ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
+        -- keep all yellow ID EXCEPT the ones at z=0 (index 3) which block doors
+        ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
+        -- side lights are decorative, keep them
+        -- ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
@@ -378,8 +371,13 @@ local function buildShip(origin)
         p.Anchored = true
         p.CanCollide = (d.T < 0.4) and (d.CC == true)
         p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
+        local pos = d.C.Position * Vector3.new(1, VS, 1)
+        -- move Engine_Pod parts UNDER Hull_Bottom (which is at y=-2*VS = -3.6)
+        if d.N:find("Engine_Pod") then
+            pos = Vector3.new(pos.X, -5 * VS, pos.Z)  -- well below hull bottom at -2*VS
+        end
+        p.CFrame = CFrame.new(pos) * d.C.Rotation
         p.Parent = m
-        p.CFrame = CFrame.new(d.C.Position * Vector3.new(1, VS, 1)) * d.C.Rotation
         restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
     end
 
