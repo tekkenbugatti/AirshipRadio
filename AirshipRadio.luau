@@ -346,8 +346,7 @@ local function buildShip(origin)
         -- side armor & cyan/yellow parts (blocking doors)
         -- keep all side armor EXCEPT the ones at z=0 (index 3) which block doors
         ["Side_Armor_-1_3"]=true, ["Side_Armor_1_3"]=true,
-        -- keep all yellow ID EXCEPT the ones at z=0 (index 3) which block doors
-        ["Yellow_Identification_-1_3"]=true, ["Yellow_Identification_1_3"]=true,
+        -- Yellow_Identification parts will be made into windows (not skipped)
         -- side lights are decorative, keep them
         -- ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
         -- Cargo_Crate parts (all of them)
@@ -385,6 +384,23 @@ local function buildShip(origin)
     end
     for _, d in ipairs(MODEL_PARTS) do
         if skipTop[d.N] then continue end
+        -- Yellow_Identification parts become glass windows
+        if d.N:find("Yellow_Identification") then
+            local p = Instance.new("Part")
+            p.Name = d.N
+            p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
+            p.Shape = d.Sh
+            p.Material = Enum.Material.Glass
+            p.Color = Color3.fromRGB(150, 200, 255)  -- light blue glass
+            p.Transparency = 0.4
+            p.Anchored = true
+            p.CanCollide = false
+            p.CustomPhysicalProperties = PhysicalProperties.new(0.05,0.3,0.5,1,1)
+            p.Parent = m
+            p.CFrame = CFrame.new(d.C.Position * Vector3.new(1, VS, 1)) * d.C.Rotation
+            restMap[p] = root.CFrame:ToObjectSpace(p.CFrame)
+            continue
+        end
         local p = Instance.new("Part")
         p.Name = d.N
         p.Size = Vector3.new(d.S.X, d.S.Y * VS, d.S.Z)
@@ -511,7 +527,7 @@ local function buildShip(origin)
 
     -- rear ramp removed (was blocking door access)
 
-    local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
+    local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false,autopilot=false,autopilotTarget=nil}
     ship._rests=restMap
     ship.doorLF = doorLF
     ship.doorLB = doorLB
@@ -621,6 +637,54 @@ local function updateShip(ship, dt)
             end
         end
         ship.hold = onShip
+        
+        -- Autopilot toggle (T key when not seated and not docking)
+        if not ship.pilot and not ship.docking then
+            if userInputService:IsKeyDown(Enum.KeyCode.T) then
+                if not ship._tPressed then
+                    ship._tPressed = true
+                    ship.autopilot = not ship.autopilot
+                    if ship.autopilot then
+                        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                        ship.autopilotTarget = hrp and (hrp.Position + hrp.CFrame.LookVector * 50) or (root.Position + Vector3.new(0, 0, 50))
+                        if ship.hud and ship.hudHint then
+                            ship.hudHint.Text = "AUTOPILOT ON — flying to target. Press T to disable."
+                        end
+                    else
+                        ship.autopilotTarget = nil
+                        if ship.hud and ship.hudHint then
+                            ship.hudHint.Text = "AUTOPILOT OFF. Press T to enable."
+                        end
+                    end
+                end
+            else
+                ship._tPressed = false
+            end
+        end
+        
+        -- Autopilot navigation (when active and not docking)
+        if ship.autopilot and ship.autopilotTarget and not ship.docking then
+            local target = ship.autopilotTarget
+            local delta = target - root.Position
+            local dist = delta.Magnitude
+            
+            if dist > 5 then
+                local targetYaw = math.atan2(target.X - root.Position.X, target.Z - root.Position.Z)
+                ship.aimYaw = ship.aimYaw + (targetYaw - ship.aimYaw) * math.min(1, dt * 2)
+                local step = delta.Unit * math.min(dist, C.ship.maxSpeed * dt * 0.5)
+                moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = string.format("AUTOPILOT — %.0f studs to target", dist)
+                end
+            else
+                ship.autopilot = false
+                ship.autopilotTarget = nil
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "AUTOPILOT — target reached. Press T to set new target."
+                end
+            end
+        end
+        
         if onShip then
             if ship.hud and ship.hudHint then
                 ship.hudHint.Text = "On board — ship holding position. Sit to pilot."
