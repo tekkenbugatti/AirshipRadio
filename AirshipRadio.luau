@@ -238,6 +238,74 @@ local function makePart(parent, props)
     return p
 end
 
+local function trycall(fn, ...)
+    local ok, v = pcall(fn, ...)
+    return ok and v or nil
+end
+
+function getSysInfo()
+    local lines = {}
+    local exec = "Unknown"
+    if type(get_executor_name) == "function" then exec = tostring(get_executor_name()) end
+    if exec == "Unknown" and type(identifyexecutor) == "function" then exec = tostring(identifyexecutor()) end
+    if exec == "Unknown" and type(getexecutorname) == "function" then exec = tostring(getexecutorname()) end
+    if exec == "Unknown" then exec = tostring(getgenv().executor or getgenv().EXECUTOR or "Unknown") end
+    lines[#lines+1] = "EXECUTOR : " .. exec
+
+    local osname = "Unknown"
+    local o = trycall(function() return os.getenv("OS") end)
+    if o then osname = tostring(o) end
+    if osname == "Unknown" then
+        local t = trycall(function() return os.getenv("OSTYPE") end)
+        if t then osname = tostring(t) end
+    end
+    if osname == "Unknown" then
+        local home = trycall(function() return os.getenv("HOME") end)
+        local up = trycall(function() return os.getenv("USERPROFILE") end)
+        if up then osname = "Windows" elseif home then osname = "Unix/Linux" end
+    end
+    lines[#lines+1] = "OS       : " .. osname
+
+    local ram = "Unknown"
+    local r = trycall(function() return getram() end)
+    if r then ram = string.format("%.2f GB", r/1024/1024/1024) end
+    if ram == "Unknown" then
+        local r2 = trycall(function() return getmemoryusage() end)
+        if r2 then ram = string.format("%.2f GB", r2/1024/1024/1024) end
+    end
+    if ram == "Unknown" then
+        local ok, gc = pcall(gcinfo)
+        if ok then ram = string.format("%.1f MB (Roblox)", gc/1024) end
+    end
+    lines[#lines+1] = "RAM      : " .. ram
+
+    local cpu = "Unknown"
+    local c = trycall(function() return getcpucount() end)
+    if c then cpu = tostring(c) .. " cores" end
+    lines[#lines+1] = "CPU      : " .. cpu
+    lines[#lines+1] = "NOTE     : PC stats need executor support"
+
+    local ver = "Unknown"
+    local v = trycall(function() return version() end)
+    if v then ver = tostring(v) end
+    lines[#lines+1] = "ROBLOX   : " .. ver
+
+    local fps = "Unknown"
+    local f = trycall(function() return workspace:GetRealPhysicsFPS() end)
+    if f then fps = string.format("%d", f) end
+    lines[#lines+1] = "FPS      : " .. fps
+
+    lines[#lines+1] = "PLAYER   : " .. tostring(player.Name) .. " (" .. tostring(player.UserId) .. ")"
+
+    local sp = "Unknown"
+    if shipRef and shipRef.root then
+        local p = shipRef.root.Position
+        sp = string.format("(%.0f, %.0f, %.0f)", p.X, p.Y, p.Z)
+    end
+    lines[#lines+1] = "SHIP POS : " .. sp
+    return table.concat(lines, "\n")
+end
+
 local function buildShip(origin)
     local m = Instance.new("Model"); m.Name = "Militech_Inspired_Airship"
     local root = Instance.new("Part")
@@ -247,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 1.3  -- vertical scale (ship a little taller)
+    local VS = 1.45  -- vertical scale (ship a little taller)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -373,6 +441,37 @@ local function buildShip(origin)
         addInt("Int_Crate_"..z, Vector3.new(2.5,2,2.5), Color3.fromRGB(28,32,42), metal, Vector3.new(0,-0.9,z), true)
     end
     addInt("Int_Bar", Vector3.new(8,1.2,1.5), Color3.fromRGB(12,14,18), plastic, Vector3.new(0,-1.3,-22), true)
+    -- reactor core
+    local reactor = hullPart("Int_Reactor", Vector3.new(4,4,4), Color3.fromRGB(6,10,14), metal, Vector3.new(0,-0.5,-18), true)
+    reactor.Shape = Enum.PartType.Cylinder
+    interior[#interior+1] = reactor
+    local reactorGlow = hullPart("Int_ReactorGlow", Vector3.new(4.4,0.5,4.4), neonCyan, Enum.Material.Neon, Vector3.new(0,1.2,-18), false)
+    reactorGlow.Shape = Enum.PartType.Cylinder
+    interior[#interior+1] = reactorGlow
+    -- table + chairs
+    addInt("Int_Table", Vector3.new(4,0.5,2), Color3.fromRGB(14,16,20), plastic, Vector3.new(0,-1.2,-5), true)
+    for _, s in ipairs({-1,1}) do
+        addInt("Int_Chair_"..(s>0 and "R" or "L"), Vector3.new(1,1,1), Color3.fromRGB(16,20,28), Enum.Material.Fabric, Vector3.new(s*2.5,-1.4,-5), true)
+    end
+    -- bunk bed
+    addInt("Int_Bunk", Vector3.new(3,2.5,6), Color3.fromRGB(18,22,30), plastic, Vector3.new(5,-1,-20), true)
+    -- wall trim neon
+    for _, s in ipairs({-1,1}) do
+        addInt("Int_WallTrim_"..(s>0 and "R" or "L"), Vector3.new(0.15,0.15,50), neonCyan, Enum.Material.Neon, Vector3.new(s*6.8,1.2,0), false)
+    end
+    -- terminal in the back
+    local term = hullPart("Int_Terminal", Vector3.new(6,4,0.5), Color3.fromRGB(4,8,12), plastic, Vector3.new(0,0.5,-24), true)
+    interior[#interior+1] = term
+    local sg = Instance.new("SurfaceGui")
+    sg.Name = "TerminalGUI"; sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(600,400)
+    sg.LightInfluence = 0; sg.Parent = term
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1,0,1,0); lbl.BackgroundColor3 = Color3.fromRGB(3,8,12)
+    lbl.BackgroundTransparency = 0.15; lbl.TextColor3 = Color3.fromRGB(0,255,170)
+    lbl.Font = Enum.Font.Code; lbl.TextSize = 18
+    lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.TextYAlignment = Enum.TextYAlignment.Top
+    lbl.Text = "BOOTING..."; lbl.Parent = sg
+    local termLabel = lbl
     for _, p in ipairs(interior) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     local pl = Instance.new("PointLight"); pl.Brightness=0.6; pl.Color=Color3.fromRGB(160,220,255); pl.Range=30; pl.Parent=root
 
@@ -406,6 +505,7 @@ local function buildShip(origin)
     ship.doorTarget = 0
     ship.doorOpened = false
     ship.hold = false
+    ship.terminalLabel = termLabel
     ship.rampPart = ramp
     ship.rampPivot = CFrame.new(0, -1.5, 33)
     ship.rampRot = math.rad(0)
@@ -684,6 +784,14 @@ function summonAirship()
         if not (ship.alive and ship.root and ship.root.Parent) then return end
         updateShip(ship, dt)
     end)
+    if ship.terminalLabel then
+        task.spawn(function()
+            while ship.alive and ship.terminalLabel and ship.terminalLabel.Parent do
+                pcall(function() ship.terminalLabel.Text = getSysInfo() end)
+                task.wait(1)
+            end
+        end)
+    end
 end
 
 local function giveRadioTool()
