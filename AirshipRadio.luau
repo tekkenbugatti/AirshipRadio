@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 1.45  -- vertical scale (ship a little taller)
+    local VS = 1.8  -- vertical scale (taller ship)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -331,6 +331,7 @@ local function buildShip(origin)
         Antenna_Mast=true, Antenna_Tip=true,
         ["Radar_Base_-15"]=true, ["Radar_Base_15"]=true,
         ["Radar_Dish_-15"]=true, ["Radar_Dish_15"]=true,
+        ["Hull_Top"]=true,
         ["Landing_Gear_-1_-21"]=true, ["Landing_Gear_-1_21"]=true,
         ["Landing_Gear_1_-21"]=true, ["Landing_Gear_1_21"]=true,
         ["Landing_Foot_-1_-21"]=true, ["Landing_Foot_-1_21"]=true,
@@ -341,6 +342,20 @@ local function buildShip(origin)
         Interior_Main_Deck=true,
         ["Command_Room_Back_Wall"]=true, ["Command_Side_Wall_-1"]=true, ["Command_Side_Wall_1"]=true,
         ["Bulkhead_Sign_Light_-15"]=true, ["Bulkhead_Sign_Light_15"]=true,
+        -- side armor & cyan/yellow parts (blocking doors)
+        ["Side_Armor_-1_0"]=true, ["Side_Armor_-1_1"]=true, ["Side_Armor_-1_2"]=true,
+        ["Side_Armor_-1_3"]=true, ["Side_Armor_-1_4"]=true, ["Side_Armor_-1_5"]=true,
+        ["Side_Armor_-1_6"]=true, ["Side_Armor_1_0"]=true, ["Side_Armor_1_1"]=true,
+        ["Side_Armor_1_2"]=true, ["Side_Armor_1_3"]=true, ["Side_Armor_1_4"]=true,
+        ["Side_Armor_1_5"]=true, ["Side_Armor_1_6"]=true,
+        ["Yellow_Identification_-1_0"]=true, ["Yellow_Identification_-1_1"]=true,
+        ["Yellow_Identification_-1_2"]=true, ["Yellow_Identification_-1_3"]=true,
+        ["Yellow_Identification_-1_4"]=true, ["Yellow_Identification_-1_5"]=true,
+        ["Yellow_Identification_-1_6"]=true, ["Yellow_Identification_1_0"]=true,
+        ["Yellow_Identification_1_1"]=true, ["Yellow_Identification_1_2"]=true,
+        ["Yellow_Identification_1_3"]=true, ["Yellow_Identification_1_4"]=true,
+        ["Yellow_Identification_1_5"]=true, ["Yellow_Identification_1_6"]=true,
+        ["Side_Light_-1"]=true, ["Side_Light_1"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
@@ -382,25 +397,23 @@ local function buildShip(origin)
     local metal = Enum.Material.Metal
     local plastic = Enum.Material.SmoothPlastic
     local hb = hullPart("Hull_Bottom", Vector3.new(24,1,62), black, metal, Vector3.new(0,-2,0), true)
-    local ht = hullPart("Hull_Top", Vector3.new(24,1,62), white, plastic, Vector3.new(0,2,0), true)
-    local lf = hullPart("Hull_Left_Front", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,16.5), true)
-    local lb = hullPart("Hull_Left_Back", Vector3.new(1,3,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
-    local rf = hullPart("Hull_Right_Front", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,16.5), true)
-    local rb = hullPart("Hull_Right_Back", Vector3.new(1,3,29), black, metal, Vector3.new(11.5,0,-16.5), true)
+    -- local ht = hullPart("Hull_Top", Vector3.new(24,1,62), white, plastic, Vector3.new(0,2,0), true)  -- removed (Z-fighting)
+    local lf = hullPart("Hull_Left_Front", Vector3.new(1,3*VS,29), black, metal, Vector3.new(-11.5,0,16.5), true)
+    local lb = hullPart("Hull_Left_Back", Vector3.new(1,3*VS,29), black, metal, Vector3.new(-11.5,0,-16.5), true)
+    local rf = hullPart("Hull_Right_Front", Vector3.new(1,3*VS,29), black, metal, Vector3.new(11.5,0,16.5), true)
+    local rb = hullPart("Hull_Right_Back", Vector3.new(1,3*VS,29), black, metal, Vector3.new(11.5,0,-16.5), true)
     local fw = hullPart("Hull_Front", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,30.5), true)
     local bw = hullPart("Hull_Back", Vector3.new(24,5,1), black, metal, Vector3.new(0,0,-30.5), true)
     local neonCyan = Color3.fromRGB(0,220,255)
     local jambs = {}
     for _, s in ipairs({-1,1}) do
-        local jf = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_F", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,2.25), true)
-        local jb = hullPart("DoorJamb_"..(s>0 and "R" or "L").."_B", Vector3.new(1,3,0.5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,0,-2.25), true)
-        local li = hullPart("DoorLintel_"..(s>0 and "R" or "L"), Vector3.new(1,0.5,5), neonCyan, Enum.Material.Neon, Vector3.new(s*11.5,1.75,0), true)
+        -- cyan door jambs/lintels removed (were blocking doors)
         jambs[#jambs+1]=jf; jambs[#jambs+1]=jb; jambs[#jambs+1]=li
     end
-    local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
-    local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
-    local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
-    local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3.5,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
+    local doorLF = hullPart("Door_L_F", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(-12.1,0,1.3), true)
+    local doorLB = hullPart("Door_L_B", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(-12.1,0,-1.3), true)
+    local doorRF = hullPart("Door_R_F", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(12.1,0,1.3), true)
+    local doorRB = hullPart("Door_R_B", Vector3.new(0.4,3*VS,2.6), white, plastic, Vector3.new(12.1,0,-1.3), true)
     for _, p in ipairs({hb,ht,lf,lb,rf,rb,fw,bw}) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
     for _, p in ipairs(jambs) do restMap[p] = root.CFrame:ToObjectSpace(p.CFrame) end
 
@@ -480,17 +493,7 @@ local function buildShip(origin)
     light.Brightness=0.8; light.Color=Color3.fromRGB(140,220,255); light.Range=60; light.Shadows=false; light.Parent=root
     m.Parent = workspace
 
-    -- create a rear ramp door not present in model
-    local ramp = Instance.new("Part")
-    ramp.Name="RearRamp"; ramp.Size=Vector3.new(14,0.5,6)
-    ramp.Color=Color3.fromRGB(10,12,16); ramp.Material=Enum.Material.Metal
-    ramp.Anchored=true; ramp.CanCollide=true; ramp.Transparency=0
-    ramp.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
-    ramp.Parent=m
-    ramp.CFrame = CFrame.new(0, -1.5, 34)
-    restMap[ramp] = root.CFrame:ToObjectSpace(ramp.CFrame)
-    -- keep ramp out of the rigid rest application by flagging
-    ramp:SetAttribute("IsRamp", true)
+    -- rear ramp removed (was blocking door access)
 
     local ship={root=root,assembly=m,seat=nil,hud=nil,alive=true,conn=nil,aimYaw=0,patrolAngle=0,pilot=false,ejectDebounce=false}
     ship._rests=restMap
@@ -507,12 +510,7 @@ local function buildShip(origin)
     ship.doorOpened = false
     ship.hold = false
     ship.terminalLabel = termLabel
-    ship.rampPart = ramp
-    ship.rampPivot = CFrame.new(0, -1.5, 33)
-    ship.rampRot = math.rad(0)
-    ship.rampTarget = math.rad(0)
-    ship.rampOpened = false
-    ship.rampSchedule = tick() + 2.2
+    -- ramp removed
     local seat=Instance.new("VehicleSeat")
     seat.Name="PilotSeat"; seat.Size=Vector3.new(2.5,1.4,2.5)
     seat.Material=Enum.Material.SmoothPlastic; seat.BrickColor=BrickColor.new("Black")
@@ -586,7 +584,7 @@ local function updateShip(ship, dt)
             else
                 local step = d.Unit * math.min(d.Magnitude, 26 * dt)
                 if hrp then
-                    ship.aimYaw = math.atan2(hrP.Position.X - root.Position.X, hrP.Position.Z - root.Position.Z)
+                    ship.aimYaw = math.atan2(hrp.Position.X - root.Position.X, hrp.Position.Z - root.Position.Z)
                 end
                 moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
                 if ship.hud and ship.hudHint then
@@ -627,19 +625,6 @@ local function updateShip(ship, dt)
             end
         end
         end
-    end
-    if ship.rampPart and ship.rampPart.Parent then
-        if not ship.rampOpened and tick() >= ship.rampSchedule then
-            ship.rampOpened = true
-            ship.rampTarget = math.rad(135)
-        end
-        local rate = 2.8
-        local dlt = ship.rampTarget - ship.rampRot
-        if math.abs(dlt) > 1e-4 then
-            local st = math.clamp(dlt, -rate*(dt or 0.016), rate*(dt or 0.016))
-            ship.rampRot = ship.rampRot + st
-        end
-        ship.rampPart.CFrame = ship.root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot,0,0)
     end
     if ship.doorLF and ship.doorLF.Parent then
         local near = hrp and (hrp.Position - root.Position).Magnitude < 16
@@ -745,9 +730,6 @@ function moveParts(ship, cf)
     end
     if ship.seat and ship.seat.Parent then
         ship.seat.CFrame = root.CFrame * ship.seatRest
-    end
-    if ship.rampPart and ship.rampPart.Parent then
-        ship.rampPart.CFrame = root.CFrame * ship.rampPivot * CFrame.Angles(ship.rampRot, 0, 0)
     end
     if ship.doorLF and ship.doorLF.Parent then
         ship.doorLF.CFrame = root.CFrame * ship.doorLFOpen * CFrame.new(0, 0, ship.doorOpen * 2.6)
