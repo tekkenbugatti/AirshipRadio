@@ -261,6 +261,10 @@ local function buildShip(origin)
         Antenna_Mast=true, Antenna_Tip=true,
         ["Radar_Base_-15"]=true, ["Radar_Base_15"]=true,
         ["Radar_Dish_-15"]=true, ["Radar_Dish_15"]=true,
+        ["Landing_Gear_-1_-21"]=true, ["Landing_Gear_-1_21"]=true,
+        ["Landing_Gear_1_-21"]=true, ["Landing_Gear_1_21"]=true,
+        ["Landing_Foot_-1_-21"]=true, ["Landing_Foot_-1_21"]=true,
+        ["Landing_Foot_1_-21"]=true, ["Landing_Foot_1_21"]=true,
     }
     local doorL, doorR
     for _, d in ipairs(MODEL_PARTS) do
@@ -375,6 +379,26 @@ local function updateShip(ship, dt)
         end
     else
         ship.ejectDebounce = false
+        -- fly down to the player when called
+        if ship.docking and ship.dockTarget then
+            local d = ship.dockTarget - root.Position
+            if d.Magnitude < 0.6 then
+                ship.docking = false
+                ship.hold = true
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "Landed — doors open. Walk aboard."
+                end
+            else
+                local step = d.Unit * math.min(d.Magnitude, 26 * dt)
+                if hrp then
+                    ship.aimYaw = math.atan2(hrP.Position.X - root.Position.X, hrP.Position.Z - root.Position.Z)
+                end
+                moveParts(ship, CFrame.new(root.Position + step) * CFrame.Angles(0, ship.aimYaw, 0))
+                if ship.hud and ship.hudHint then
+                    ship.hudHint.Text = "Descending to you..."
+                end
+            end
+        else
         -- hold position while the player is standing on the deck
         local onShip = false
         if hrp then
@@ -407,6 +431,7 @@ local function updateShip(ship, dt)
                 ship.hudHint.Text = "Patrol ~"..math.floor(C.ship.radius).." studs away. WASD/QE onboard. Step in, 'E' to sit."
             end
         end
+        end
     end
     if ship.rampPart and ship.rampPart.Parent then
         if not ship.rampOpened and tick() >= ship.rampSchedule then
@@ -435,6 +460,19 @@ local function updateShip(ship, dt)
     end
 end
 
+local function bringShipDown(ship)
+    if not ship then return end
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local front = hrp.CFrame.LookVector * 10
+    local target = hrp.Position + front
+    ship.dockTarget = Vector3.new(target.X, target.Y + C.spawn.dockAlt, target.Z)
+    ship.docking = true
+    ship.hold = false
+    ship.anchorPos = hrp.Position
+    ship.patrolAngle = 0
+end
+
 local function buildRadioTool()
     local tool = Instance.new("Tool")
     tool.Name = "Airship Radio"; tool.RequiresHandle = true; tool.CanBeDropped = false
@@ -456,9 +494,7 @@ local function buildRadioTool()
 
     tool.Activated:Connect(function()
         if shipRef then
-            destroyShip()
-            task.wait(0.2)
-            summonAirship()
+            bringShipDown(shipRef)
         else
             summonAirship()
         end
@@ -524,12 +560,16 @@ function summonAirship()
     task.wait(0.05)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     local origin = (hrp and hrp.Position) or Vector3.new(0,80,0)
-    -- Float down in front, then settle low enough to board.
+    if hrp then
+        origin = origin + hrp.CFrame.LookVector * 10
+    end
     shipRef = buildShip(origin)
     local ship = shipRef
-    ship.anchorPos = origin + (hrp and hrp.CFrame.LookVector * 8 or Vector3.new(0,0,0))
+    ship.anchorPos = origin
     ship.aimYaw = 0
-    -- Spawn straight at dock height (no pop-in wait/rely risk).
+    ship.docking = false
+    ship.dockTarget = nil
+    ship.hold = false
     moveParts(ship, CFrame.new(origin.X, origin.Y + C.spawn.dockAlt, origin.Z))
     buildHUD(ship)
     getgenv().__AIRSHIP = { alive=true, destroy=destroyShip, ship=ship }
