@@ -522,6 +522,7 @@ local function buildShip(origin)
     ship.doorOpen = 0
     ship.doorTarget = 0
     ship.doorOpened = false
+    ship.doorSchedule = tick() + 2.2  -- auto-open after 2.2 seconds
     ship.hold = false
     ship.terminalLabel = termLabel
     -- ramp removed
@@ -641,12 +642,16 @@ local function updateShip(ship, dt)
         end
     end
     if ship.doorLF and ship.doorLF.Parent then
-        local near = hrp and (hrp.Position - root.Position).Magnitude < 5
-        if near then
+                local near = hrp and (hrp.Position - root.Position).Magnitude < 5
+        -- Timer-based: open after schedule, stay open; Proximity-based: open when near
+        local timerTriggered = not ship.doorOpened and tick() >= ship.doorSchedule
+        if timerTriggered then
             ship.doorOpened = true
+                    end
+        local shouldOpen = near or ship.doorOpened
+        if shouldOpen then
             ship.doorTarget = 1
         else
-            ship.doorOpened = false
             ship.doorTarget = 0
         end
         local drate = 1.8
@@ -779,7 +784,7 @@ function summonAirship()
     buildHUD(ship)
     getgenv().__AIRSHIP = { alive=true, destroy=destroyShip, ship=ship }
     ship.conn = RS.Heartbeat:Connect(function(dt)
-        if not (ship.alive and ship.root and ship.root.Parent) then return end
+                if not (ship.alive and ship.root and ship.root.Parent) then return end
         updateShip(ship, dt)
     end)
     if ship.terminalLabel then
