@@ -355,6 +355,15 @@ local function buildShip(origin)
         ["Cargo_Crate_5_-10"]=true, ["Cargo_Crate_5_-4"]=true, ["Cargo_Crate_5_4"]=true, ["Cargo_Crate_5_10"]=true,
         -- Int_Ceiling (model part if any)
         ["Int_Ceiling"]=true,
+        -- Crate_Rib parts (all of them)
+        ["Crate_Rib_-5_-10_-1.2"]=true, ["Crate_Rib_-5_-10_1.2"]=true,
+        ["Crate_Rib_-5_-4_-1.2"]=true, ["Crate_Rib_-5_-4_1.2"]=true,
+        ["Crate_Rib_-5_4_-1.2"]=true, ["Crate_Rib_-5_4_1.2"]=true,
+        ["Crate_Rib_-5_10_-1.2"]=true, ["Crate_Rib_-5_10_1.2"]=true,
+        ["Crate_Rib_5_-10_-1.2"]=true, ["Crate_Rib_5_-10_1.2"]=true,
+        ["Crate_Rib_5_-4_-1.2"]=true, ["Crate_Rib_5_-4_1.2"]=true,
+        ["Crate_Rib_5_4_-1.2"]=true, ["Crate_Rib_5_4_1.2"]=true,
+        ["Crate_Rib_5_10_-1.2"]=true, ["Crate_Rib_5_10_1.2"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
