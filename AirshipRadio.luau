@@ -315,7 +315,7 @@ local function buildShip(origin)
     root.CustomPhysicalProperties=PhysicalProperties.new(0.05,0.3,0.5,1,1)
     root.Parent=m
 
-    local VS = 2.2  -- vertical scale (much taller ship)
+    local VS = 1.4  -- vertical scale (decreased by 5 studs from previous)
 
     local function recolor(c, mat)
         if mat == Enum.Material.Neon then
@@ -364,6 +364,13 @@ local function buildShip(origin)
         ["Crate_Rib_5_-4_-1.2"]=true, ["Crate_Rib_5_-4_1.2"]=true,
         ["Crate_Rib_5_4_-1.2"]=true, ["Crate_Rib_5_4_1.2"]=true,
         ["Crate_Rib_5_10_-1.2"]=true, ["Crate_Rib_5_10_1.2"]=true,
+        -- Engine parts (all of them)
+        ["Engine_Rim_-1_0"]=true, ["Engine_Rim_-1_1"]=true, ["Engine_Rim_-1_2"]=true, ["Engine_Rim_-1_3"]=true,
+        ["Engine_Rim_1_0"]=true, ["Engine_Rim_1_1"]=true, ["Engine_Rim_1_2"]=true, ["Engine_Rim_1_3"]=true,
+        ["Engine_Pod_-1_0"]=true, ["Engine_Pod_-1_1"]=true, ["Engine_Pod_-1_2"]=true, ["Engine_Pod_-1_3"]=true,
+        ["Engine_Pod_1_0"]=true, ["Engine_Pod_1_1"]=true, ["Engine_Pod_1_2"]=true, ["Engine_Pod_1_3"]=true,
+        ["Engine_Core_-1_0"]=true, ["Engine_Core_-1_1"]=true, ["Engine_Core_-1_2"]=true, ["Engine_Core_-1_3"]=true,
+        ["Engine_Core_1_0"]=true, ["Engine_Core_1_1"]=true, ["Engine_Core_1_2"]=true, ["Engine_Core_1_3"]=true,
     }
     for _, n in ipairs({"Ceiling_Rib_-13","Ceiling_Rib_-9","Ceiling_Rib_-5","Ceiling_Rib_-1","Ceiling_Rib_3","Ceiling_Rib_7","Ceiling_Rib_11",
                        "Ceiling_Light_-13","Ceiling_Light_-9","Ceiling_Light_-5","Ceiling_Light_-1","Ceiling_Light_3","Ceiling_Light_7","Ceiling_Light_11"}) do
